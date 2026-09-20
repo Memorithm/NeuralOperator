@@ -1,3 +1,14 @@
+## Current checkpoint — 20 September 2026
+
+Since the initial roadmap was written, the following repository changes are merged:
+
+- PR #11: deterministic recursive Burgers rollout evaluation with per-step error, finite-horizon physics residual, and mean/energy mismatch metrics.
+- PR #12: explicit train/validation/OOD partition specifications with shared-grid and shared-horizon checks.
+- PR #13: PolyForm Noncommercial 1.0.0 license, copyright Required Notice, and commercial licensing guide.
+
+These changes do not establish a production performance advantage, continuous-time PINO validity, or resolution invariance. The next technical gate remains an optional autodiff backend retained against the NumPy/SciPy oracle, followed by a nonlinear DeepONet and larger PDE families.
+
+---
 # Bilan et feuille de route — Neural Operators
 
 Date de l'audit : 20 septembre 2026.
