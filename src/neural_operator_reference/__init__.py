@@ -34,6 +34,12 @@ from .baselines import (
     periodic_linear_interpolate,
 )
 from .deeponet import DeepONetFitResult, LinearDeepONet1D, fourier_trunk_features
+from .evaluation import (
+    BurgersRolloutMetrics,
+    evaluate_burgers_operator,
+    evaluate_burgers_rollout,
+    rollout_burgers_operator,
+)
 
 __all__ = [
     "burgers_residual",
@@ -68,4 +74,8 @@ __all__ = [
     "DeepONetFitResult",
     "LinearDeepONet1D",
     "fourier_trunk_features",
+    "BurgersRolloutMetrics",
+    "evaluate_burgers_operator",
+    "evaluate_burgers_rollout",
+    "rollout_burgers_operator",
 ]
