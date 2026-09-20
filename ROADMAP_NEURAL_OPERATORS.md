@@ -5,6 +5,7 @@ Since the initial roadmap was written, the following repository changes are merg
 - PR #11: deterministic recursive Burgers rollout evaluation with per-step error, finite-horizon physics residual, and mean/energy mismatch metrics.
 - PR #12: explicit train/validation/OOD partition specifications with shared-grid and shared-horizon checks.
 - PR #13: PolyForm Noncommercial 1.0.0 license, copyright Required Notice, and commercial licensing guide.
+- PR #15: static sinusoidal forcing in the Burgers solver, physics diagnostics, datasets, and OOD split provenance.
 
 These changes do not establish a production performance advantage, continuous-time PINO validity, or resolution invariance. The next technical gate remains an optional autodiff backend retained against the NumPy/SciPy oracle, followed by a nonlinear DeepONet and larger PDE families.
 
@@ -143,9 +144,9 @@ points, contre `1,87 %` pour le FNO évalué sur l'entrée fine exacte : ce
 contre-résultat indique que l'horizon et la famille de données sont trop
 simples pour attribuer un avantage au mélange spectral.
 
-Reste à faire dans M2 : remplacer l'optimisation par différences finies par un
-backend autodiff et ajouter DeepONet, avec une séparation stricte des familles
-de paramètres et plusieurs graines.
+Reste à faire dans M2 : valider le backend autodiff optionnel contre l'oracle
+NumPy/SciPy sur une séparation stricte des familles de paramètres et plusieurs
+graines, puis ajouter un DeepONet non linéaire entraîné par autodifférentiation.
 
 Une première référence `LinearDeepONet1D` est maintenant disponible dans
 `deeponet.py`. Elle sépare explicitement le branch (capteurs de la fonction)
@@ -153,6 +154,13 @@ et le trunk (coordonnées de requête), et vérifie la sortie à 16 puis 32 poin
 Le trunk est fixe et Fourier, et le branch est linéaire : cette étape valide le
 contrat de coordonnées mais ne remplace pas encore un DeepONet non linéaire
 entraîné par autodiff.
+
+Le backend optionnel `TorchFNO1D` est disponible dans
+`torch_backend.py`. Il conserve le contrat du FNO NumPy/SciPy et remplace
+l'optimisation par différences finies par une boucle Adam différentiable. Les
+tests sont conditionnels à l'installation de PyTorch ; tant que la comparaison
+multi-graine n'est pas exécutée, ce backend reste une étape d'implémentation et
+non une preuve de gain.
 
 Le code de référence `neuraloperator` est utile pour comparer les résultats,
 mais il ne doit pas être confondu avec une implémentation Memorithm. Sa
@@ -166,6 +174,9 @@ Le solveur Burgers 1D périodique de référence est maintenant implémenté dan
 anti-aliasé et des contrôles de moyenne et d'énergie. La génération de datasets
 déterministe est maintenant disponible dans `datasets.py`, et un premier FNO
 est entraîné sur Burgers dans `scripts/burgers_fno_experiment.py`.
+Le protocole OOD accepte aussi un forcing sinusoïdal statique avec provenance
+explicite ; le forcing dépendant du temps reste hors du contrat du solveur de
+référence.
 
 Ordre recommandé :
 

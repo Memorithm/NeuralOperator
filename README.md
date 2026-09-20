@@ -21,14 +21,16 @@ machine learning :
 - référence DeepONet séparable à trunk Fourier fixe ;
 - évaluation récursive multi-pas avec erreur, résidu et écarts de conservation ;
 - partitions déterministes train/validation/OOD avec provenance des paramètres ;
+- backend FNO PyTorch optionnel entraîné par autodifférentiation ;
 - tests déterministes sur fonctions analytiques.
 
-Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
-entraîné par différences finies via SciPy. Il ne remplace pas encore un backend
-PyTorch ou Rust. La baseline linéaire n'est pas présentée comme un réseau
-neuronal. Cette séparation est
-volontaire : le socle numérique doit être validé avant de servir de cible à une
-implémentation PyTorch puis Rust.
+Le FNO NumPy/SciPy reste un oracle de recherche volontairement petit et lent,
+entraîné par différences finies via SciPy. Le backend PyTorch est maintenant
+disponible en option pour l'autodifférentiation ; il n'est pas ajouté aux
+dépendances de base et aucune équivalence de performance n'est encore
+revendiquée. La baseline linéaire n'est pas présentée comme un réseau neuronal.
+Cette séparation conserve l'oracle numérique comme cible d'acceptation avant
+un futur portage Rust.
 
 ## Exécution
 
@@ -49,8 +51,26 @@ PYTHONPATH=src python3 scripts/burgers_rollout_experiment.py
 PYTHONPATH=src python3 scripts/burgers_split_experiment.py
 ```
 
-Dépendances utilisées : NumPy et SciPy. Aucun téléchargement de données ni
-aucun accès réseau n'est nécessaire pour ces vérifications.
+Dépendances de base : NumPy et SciPy. Aucun téléchargement de données ni aucun
+accès réseau n'est nécessaire pour ces vérifications.
+
+Pour activer le backend autodiff optionnel :
+
+```bash
+python3 -m pip install -r requirements-autodiff.txt
+PYTHONPATH=src python3 -m unittest discover -s tests -v
+PYTHONPATH=src python3 scripts/torch_fno_experiment.py
+```
+
+Sans PyTorch, les tests optionnels sont ignorés et la suite NumPy/SciPy reste
+exécutable.
+
+## État du backend autodiff
+
+Le backend optionnel `TorchFNO1D` reprend le contrat `(batch, points, channels)`
+du FNO de référence et entraîne ses paramètres par autodifférentiation. Le
+prochain contrôle est une comparaison sur les mêmes partitions train,
+validation et OOD, avec plusieurs graines et métriques de rollout.
 
 ## Prochain jalon
 
