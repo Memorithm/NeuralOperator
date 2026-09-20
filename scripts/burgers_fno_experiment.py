@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from neural_operator_reference import (  # noqa: E402
     NumpyFNO1D,
+    burgers_transition_physics_loss,
     generate_burgers_dataset,
     relative_l2_error,
 )
@@ -54,6 +55,22 @@ def main() -> None:
                     ),
                     "zero_shot_resolution_32": relative_l2_error(
                         model(fine.inputs), fine.targets
+                    ),
+                },
+                "physics_mse": {
+                    "held_out_resolution_16": burgers_transition_physics_loss(
+                        held_out.inputs[..., 0],
+                        model(held_out.inputs)[..., 0],
+                        horizon=held_out.dt * held_out.steps,
+                        viscosity=held_out.viscosity,
+                        length=held_out.length,
+                    ),
+                    "zero_shot_resolution_32": burgers_transition_physics_loss(
+                        fine.inputs[..., 0],
+                        model(fine.inputs)[..., 0],
+                        horizon=fine.dt * fine.steps,
+                        viscosity=fine.viscosity,
+                        length=fine.length,
                     ),
                 },
                 "dataset": {

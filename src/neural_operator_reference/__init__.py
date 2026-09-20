@@ -22,6 +22,11 @@ from .burgers import (
     periodic_mean,
 )
 from .datasets import BurgersDataset, generate_burgers_dataset, random_periodic_fields
+from .physics import (
+    burgers_data_physics_loss,
+    burgers_transition_physics_loss,
+    burgers_transition_residual,
+)
 
 __all__ = [
     "burgers_residual",
@@ -45,4 +50,7 @@ __all__ = [
     "BurgersDataset",
     "generate_burgers_dataset",
     "random_periodic_fields",
+    "burgers_data_physics_loss",
+    "burgers_transition_physics_loss",
+    "burgers_transition_residual",
 ]
