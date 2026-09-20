@@ -51,6 +51,7 @@ from .evaluation import (
     rollout_burgers_operator,
 )
 from .torch_fno1d import TorchFNO1D, TorchFNOFitResult
+from .torch_deeponet import TorchDeepONet1D, TorchDeepONetFitResult
 
 __all__ = [
     "burgers_residual",
@@ -95,4 +96,6 @@ __all__ = [
     "rollout_burgers_operator",
     "TorchFNO1D",
     "TorchFNOFitResult",
+    "TorchDeepONet1D",
+    "TorchDeepONetFitResult",
 ]
