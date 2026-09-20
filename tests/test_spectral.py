@@ -20,6 +20,7 @@ from neural_operator_reference import (  # noqa: E402
     central_difference_periodic,
     PeriodicConv1D,
     dealias_mask,
+    LinearDeepONet1D,
     dealiased_product,
     divergence_2d,
     incompressible_velocity_from_streamfunction,
@@ -322,6 +323,29 @@ class SpectralReferenceTests(unittest.TestCase):
 
         self.assertLess(result.final_loss, 1.0e-24)
         self.assertLess(model.loss(inputs, targets), 1.0e-24)
+
+    def test_linear_deeponet_transfers_to_arbitrary_query_resolution(self):
+        rng = np.random.default_rng(20260920)
+        sensor_points = 16
+        modes = 3
+        inputs = rng.normal(size=(24, sensor_points, 1))
+        teacher = LinearDeepONet1D(sensor_points=sensor_points, modes=modes)
+        teacher.branch_weight[...] = rng.normal(
+            size=teacher.branch_weight.shape
+        )
+        teacher.branch_bias[...] = rng.normal(size=teacher.branch_bias.shape)
+        coarse_coordinates = np.arange(sensor_points) * 2.0 * np.pi / sensor_points
+        fine_coordinates = np.arange(32) * 2.0 * np.pi / 32
+        coarse_targets = teacher(inputs, coordinates=coarse_coordinates)
+        fine_targets = teacher(inputs, coordinates=fine_coordinates)
+
+        model = LinearDeepONet1D(sensor_points=sensor_points, modes=modes)
+        result = model.fit(inputs, coarse_targets, coordinates=coarse_coordinates)
+
+        self.assertLess(result.final_loss, 1.0e-22)
+        self.assertLess(
+            model.loss(inputs, fine_targets, coordinates=fine_coordinates), 1.0e-22
+        )
 
 
 if __name__ == "__main__":
