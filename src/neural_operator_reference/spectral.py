@@ -119,6 +119,25 @@ def spectral_filter(
     return filtered
 
 
+def central_difference_periodic(
+    values: Array,
+    length: float = 2.0 * np.pi,
+    axis: int = -1,
+) -> Array:
+    """Return the second-order centered periodic finite-difference derivative."""
+
+    values = np.asarray(values)
+    if values.ndim == 0:
+        raise ValueError("values must contain a spatial axis")
+    axis = _validate_axis(axis, values.ndim)
+    length = _validate_length(length)
+    n = values.shape[axis]
+    if n < 3:
+        raise ValueError("at least three points are required")
+    step = length / n
+    return (np.roll(values, -1, axis=axis) - np.roll(values, 1, axis=axis)) / (2.0 * step)
+
+
 def dealiased_product(
     left: Array,
     right: Array,
