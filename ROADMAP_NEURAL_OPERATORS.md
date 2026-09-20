@@ -17,10 +17,12 @@ Elle ne contient ni dépôt logiciel, ni jeu de données, ni modèle entraîné,
 mesure reproductible. Le workspace contient Python 3.12, NumPy et SciPy ; Rust,
 Cargo et PyTorch ne sont pas disponibles dans cet environnement.
 
-Le premier lot implémenté se trouve dans `neural_operator_lab/`. Il valide les
-opérations numériques qui seront réutilisées par le FNO/PINO, sans prétendre
-déjà fournir un modèle neuronal. Le complément M1 compare désormais la
-convergence spectrale à une différence finie périodique sur une fonction lisse.
+Le socle initial implémenté dans `neural_operator_lab/` valide les opérations
+numériques qui seront réutilisées par le FNO/PINO. Le complément M1 compare
+désormais la convergence spectrale à une différence finie périodique sur une
+fonction lisse.
+Le lot M2 contient maintenant un FNO 1D minimal entraînable par SciPy et une
+expérience de transfert de résolution sur un opérateur synthétique à modes bas.
 
 ## 2. Évaluation scientifique de la note
 
@@ -97,12 +99,26 @@ explicitement reportée jusqu'à l'ajout d'un backend ML.
 
 ### Lot M2 — Baselines d'apprentissage
 
+- FNO 1D minimal avec couche spectrale, transformation locale, activation et
+  projection ;
+- entraînement de référence par différences finies via SciPy ;
+- séparation entraînement / retenu / résolution double sur un opérateur
+  synthétique contrôlé ;
 - DeepONet sur un opérateur 1D simple ;
-- FNO 1D minimal à nombre de modes contrôlé ;
 - baseline convolutionnelle et baseline interpolation ;
 - protocole de séparation des familles de paramètres, pas seulement des points
   de grille ;
 - entraînement déterministe avec plusieurs graines.
+
+Le FNO minimal et son script sont dans `src/neural_operator_reference/fno1d.py`
+et `scripts/fno_experiment.py`. Sur l'expérience actuelle, la MSE passe de
+`0,3998` à `3,76×10^-6` sur l'entraînement ; la résolution doublée atteint une
+MSE de `1,29×10^-4` et une erreur relative de `1,45 %`. Ces chiffres ne sont
+pas extrapolés à une EDP ou à un autre régime.
+
+Reste à faire dans M2 : remplacer l'optimisation par différences finies par un
+backend autodiff, ajouter DeepONet, puis comparer avec une baseline
+convolutionnelle et une baseline interpolation.
 
 Le code de référence `neuraloperator` est utile pour comparer les résultats,
 mais il ne doit pas être confondu avec une implémentation Memorithm. Sa

@@ -12,10 +12,13 @@ machine learning :
   courant ;
 - masque et produit anti-aliasés selon la règle des `2/3` ;
 - baseline d'opérateur de Fourier linéaire ajustée par moindres carrés ;
+- FNO 1D minimal entraînable par SciPy pour validation de protocole ;
 - tests déterministes sur fonctions analytiques.
 
-Ce n'est pas encore un FNO ni un PINO entraînable. La baseline linéaire n'est
-pas présentée comme un réseau neuronal. Cette séparation est
+Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
+entraîné par différences finies via SciPy. Il ne remplace pas encore un backend
+PyTorch ou Rust. La baseline linéaire n'est pas présentée comme un réseau
+neuronal. Cette séparation est
 volontaire : le socle numérique doit être validé avant de servir de cible à une
 implémentation PyTorch puis Rust.
 
@@ -27,20 +30,26 @@ Depuis la racine du workspace :
 cd NeuralOperator
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 scripts/reference_experiment.py
+PYTHONPATH=src python3 scripts/fno_experiment.py
 ```
 
-Dépendance utilisée : NumPy. Aucun téléchargement de données ni aucun accès
-réseau n'est nécessaire pour ces vérifications.
+Dépendances utilisées : NumPy et SciPy. Aucun téléchargement de données ni
+aucun accès réseau n'est nécessaire pour ces vérifications.
 
 ## Prochain jalon
 
-Ajouter un benchmark d'opérateur 1D périodique (Burgers) avec :
+Ajouter un benchmark d'opérateur 1D périodique basé sur Burgers avec :
 
 1. solveur de référence contrôlé ;
 2. baseline interpolation/conv1d ;
-3. FNO entraînable ;
+3. FNO entraînable sur données d'EDP ;
 4. pertes données + résidu PDE ;
 5. évaluation multi-résolution et stabilité du rollout.
 
 Les résultats devront inclure l'erreur relative, le résidu physique, la
 conservation pertinente, le coût d'entraînement amorti et le coût d'inférence.
+
+L'expérience FNO est volontairement synthétique : elle vérifie le contrat
+spectral et le transfert de résolution sur un opérateur linéaire à modes bas.
+Elle ne constitue pas encore une validation sur une EDP ni une comparaison de
+performance avec PyTorch.

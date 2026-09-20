@@ -13,6 +13,7 @@ from .spectral import (
     wave_numbers,
 )
 from .linear_operator import FourierMultiplier1D
+from .fno1d import FNOFitResult, NumpyFNO1D
 
 __all__ = [
     "burgers_residual",
@@ -26,4 +27,6 @@ __all__ = [
     "spectral_filter",
     "wave_numbers",
     "FourierMultiplier1D",
+    "FNOFitResult",
+    "NumpyFNO1D",
 ]
