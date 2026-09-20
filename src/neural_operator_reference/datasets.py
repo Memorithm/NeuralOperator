@@ -20,6 +20,8 @@ class BurgersDataset:
     steps: int
     viscosity: float
     seed: int
+    modes: int = 4
+    amplitude: float = 0.5
 
     @property
     def resolution(self) -> int:
@@ -28,6 +30,12 @@ class BurgersDataset:
     @property
     def samples(self) -> int:
         return int(self.inputs.shape[0])
+
+    @property
+    def horizon(self) -> float:
+        """Return the physical duration represented by each input/target pair."""
+
+        return float(self.dt * self.steps)
 
 
 def random_periodic_fields(
@@ -73,7 +81,7 @@ def generate_burgers_dataset(
     modes: int = 4,
     amplitude: float = 0.5,
 ) -> BurgersDataset:
-    """Generate ``u(0) -> u(steps*dt)`` pairs with full provenance."""
+    """Generate u(0) -> u(steps*dt) pairs with full provenance."""
 
     initial_fields = random_periodic_fields(
         samples=samples,
@@ -98,4 +106,6 @@ def generate_burgers_dataset(
         steps=int(steps),
         viscosity=float(viscosity),
         seed=int(seed),
+        modes=int(modes),
+        amplitude=float(amplitude),
     )
