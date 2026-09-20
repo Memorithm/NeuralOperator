@@ -116,6 +116,13 @@ et `scripts/fno_experiment.py`. Sur l'expérience actuelle, la MSE passe de
 MSE de `1,29×10^-4` et une erreur relative de `1,45 %`. Ces chiffres ne sont
 pas extrapolés à une EDP ou à un autre régime.
 
+Une baseline non neuronale de rééchantillonnage linéaire périodique est ajoutée
+dans `baselines.py`. Le script
+`scripts/burgers_resolution_baseline_experiment.py` compare l'interpolation de
+la sortie FNO grossière à une évaluation directe du même FNO sur une entrée
+rééchantillonnée fine. La baseline ne prétend pas apprendre l'opérateur : elle
+mesure le coût de ne faire que transporter une prédiction déjà calculée.
+
 Reste à faire dans M2 : remplacer l'optimisation par différences finies par un
 backend autodiff, ajouter DeepONet, puis comparer avec une baseline
 convolutionnelle et une baseline interpolation.

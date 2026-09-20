@@ -28,6 +28,7 @@ from .physics import (
     burgers_transition_residual,
 )
 from .training import PhysicsFitResult, fit_fno_burgers_physics
+from .baselines import periodic_linear_interpolate
 
 __all__ = [
     "burgers_residual",
@@ -56,4 +57,5 @@ __all__ = [
     "burgers_transition_residual",
     "PhysicsFitResult",
     "fit_fno_burgers_physics",
+    "periodic_linear_interpolate",
 ]
