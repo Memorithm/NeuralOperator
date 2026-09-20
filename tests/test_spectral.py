@@ -18,6 +18,7 @@ from neural_operator_reference import (  # noqa: E402
     integrate_burgers,
     burgers_residual,
     central_difference_periodic,
+    PeriodicConv1D,
     dealias_mask,
     dealiased_product,
     divergence_2d,
@@ -304,6 +305,23 @@ class SpectralReferenceTests(unittest.TestCase):
         self.assertLess(relative_l2_error(interpolated, expected), 3.0e-2)
         constant = periodic_linear_interpolate(np.full(source_points, 0.75), 23)
         self.assertTrue(np.allclose(constant, 0.75))
+
+    def test_periodic_convolution_baseline_fits_a_known_stencil(self):
+        rng = np.random.default_rng(20260920)
+        inputs = rng.normal(size=(4, 16, 1))
+        field = inputs[..., 0]
+        targets = (
+            0.2 * np.roll(field, -1, axis=1)
+            + 0.5 * field
+            - 0.1 * np.roll(field, 1, axis=1)
+            + 0.3
+        )[..., None]
+
+        model = PeriodicConv1D(kernel_size=3)
+        result = model.fit(inputs, targets)
+
+        self.assertLess(result.final_loss, 1.0e-24)
+        self.assertLess(model.loss(inputs, targets), 1.0e-24)
 
 
 if __name__ == "__main__":

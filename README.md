@@ -17,6 +17,7 @@ machine learning :
 - génération déterministe de datasets Burgers avec métadonnées ;
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
+- baseline convolutionnelle locale périodique ajustée par moindres carrés ;
 - tests déterministes sur fonctions analytiques.
 
 Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
