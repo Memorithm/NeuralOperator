@@ -9,6 +9,7 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from neural_operator_reference import (  # noqa: E402
     FourierMultiplier1D,
+    NumpyFNO1D,
     burgers_residual,
     central_difference_periodic,
     dealias_mask,
@@ -145,6 +146,52 @@ class SpectralReferenceTests(unittest.TestCase):
         self.assertLess(errors_spectral[-1], errors_spectral[0] * 1.0e-4)
         self.assertLess(errors_finite_difference[-1], errors_finite_difference[0])
         self.assertLess(errors_spectral[-1], errors_finite_difference[-1])
+
+    def test_fno_reference_learns_a_low_mode_operator(self):
+        length = 2.0 * np.pi
+        n = 12
+        x = np.arange(n) * length / n
+        rng = np.random.default_rng(20260920)
+        inputs = []
+        targets = []
+        for _ in range(4):
+            field = (
+                rng.normal() * np.sin(x)
+                + rng.normal() * np.cos(x)
+                + rng.normal() * np.sin(2.0 * x)
+            )
+            inputs.append(field[:, None])
+            spectrum = np.fft.rfft(field)
+            response = np.zeros_like(spectrum, dtype=float)
+            response[:3] = (0.2, 0.5, 0.1)
+            targets.append(np.fft.irfft(spectrum * response, n=n)[:, None])
+        inputs = np.asarray(inputs)
+        targets = np.asarray(targets)
+
+        model = NumpyFNO1D(width=3, modes=4, seed=4)
+        result = model.fit(inputs, targets, maxiter=150, tolerance=1.0e-8)
+
+        self.assertLess(result.final_loss, result.initial_loss)
+        self.assertLess(result.final_loss, 5.0e-4)
+
+        fine_n = 24
+        fine_x = np.arange(fine_n) * length / fine_n
+        fine_inputs = []
+        fine_targets = []
+        for _ in range(2):
+            field = (
+                rng.normal() * np.sin(fine_x)
+                + rng.normal() * np.cos(fine_x)
+                + rng.normal() * np.sin(2.0 * fine_x)
+            )
+            spectrum = np.fft.rfft(field)
+            response = np.zeros_like(spectrum, dtype=float)
+            response[:3] = (0.2, 0.5, 0.1)
+            fine_inputs.append(field[:, None])
+            fine_targets.append(np.fft.irfft(spectrum * response, n=fine_n)[:, None])
+        fine_inputs = np.asarray(fine_inputs)
+        fine_targets = np.asarray(fine_targets)
+        self.assertLess(model.loss(fine_inputs, fine_targets), 5.0e-4)
 
 
 if __name__ == "__main__":
