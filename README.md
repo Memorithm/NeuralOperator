@@ -18,6 +18,7 @@ machine learning :
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
 - baseline convolutionnelle locale périodique ajustée par moindres carrés ;
+- référence DeepONet séparable à trunk Fourier fixe ;
 - tests déterministes sur fonctions analytiques.
 
 Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
@@ -41,6 +42,7 @@ PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
 PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
 PYTHONPATH=src python3 scripts/burgers_resolution_baseline_experiment.py
+PYTHONPATH=src python3 scripts/deeponet_experiment.py
 ```
 
 Dépendances utilisées : NumPy et SciPy. Aucun téléchargement de données ni

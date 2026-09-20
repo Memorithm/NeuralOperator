@@ -33,6 +33,7 @@ from .baselines import (
     PeriodicConv1D,
     periodic_linear_interpolate,
 )
+from .deeponet import DeepONetFitResult, LinearDeepONet1D, fourier_trunk_features
 
 __all__ = [
     "burgers_residual",
@@ -64,4 +65,7 @@ __all__ = [
     "periodic_linear_interpolate",
     "ConvolutionFitResult",
     "PeriodicConv1D",
+    "DeepONetFitResult",
+    "LinearDeepONet1D",
+    "fourier_trunk_features",
 ]

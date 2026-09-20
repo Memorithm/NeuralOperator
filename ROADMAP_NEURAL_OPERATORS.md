@@ -136,6 +136,13 @@ Reste à faire dans M2 : remplacer l'optimisation par différences finies par un
 backend autodiff et ajouter DeepONet, avec une séparation stricte des familles
 de paramètres et plusieurs graines.
 
+Une première référence `LinearDeepONet1D` est maintenant disponible dans
+`deeponet.py`. Elle sépare explicitement le branch (capteurs de la fonction)
+et le trunk (coordonnées de requête), et vérifie la sortie à 16 puis 32 points.
+Le trunk est fixe et Fourier, et le branch est linéaire : cette étape valide le
+contrat de coordonnées mais ne remplace pas encore un DeepONet non linéaire
+entraîné par autodiff.
+
 Le code de référence `neuraloperator` est utile pour comparer les résultats,
 mais il ne doit pas être confondu avec une implémentation Memorithm. Sa
 compatibilité actuelle et son coût devront être gelés dans l'environnement de
