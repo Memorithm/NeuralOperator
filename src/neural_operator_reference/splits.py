@@ -13,9 +13,9 @@ from .datasets import BurgersDataset, generate_burgers_dataset
 class BurgersDatasetSpec:
     """Configuration and provenance for one Burgers experiment partition.
 
-    The split currently varies the initial-condition family through modes and
-    amplitude, and can vary viscosity. Forcing is deliberately not exposed
-    until the reference solver has an explicit forcing contract.
+    The split varies the initial-condition family through modes and amplitude,
+    viscosity, and a static sinusoidal forcing amplitude/mode. Time-dependent
+    forcing is deliberately outside this reference solver contract.
     """
 
     samples: int
@@ -27,6 +27,8 @@ class BurgersDatasetSpec:
     length: float = 2.0 * np.pi
     modes: int = 4
     amplitude: float = 0.5
+    forcing_amplitude: float = 0.0
+    forcing_mode: int = 1
 
     def build(self) -> BurgersDataset:
         """Generate this partition with the reference solver."""
@@ -41,6 +43,8 @@ class BurgersDatasetSpec:
             length=self.length,
             modes=self.modes,
             amplitude=self.amplitude,
+            forcing_amplitude=self.forcing_amplitude,
+            forcing_mode=self.forcing_mode,
         )
 
     def as_dict(self) -> dict[str, int | float]:
@@ -56,6 +60,8 @@ class BurgersDatasetSpec:
             "length": float(self.length),
             "modes": int(self.modes),
             "amplitude": float(self.amplitude),
+            "forcing_amplitude": float(self.forcing_amplitude),
+            "forcing_mode": int(self.forcing_mode),
         }
 
 
@@ -88,9 +94,9 @@ def generate_burgers_split(
     """Generate compatible train, validation and OOD partitions.
 
     The spatial grid and transition duration must be shared across partitions.
-    Initial-condition statistics and viscosity may differ by design. This
-    prevents an OOD result from silently mixing changes in the numerical grid
-    or prediction horizon with changes in the physical/data distribution.
+    Initial-condition statistics, viscosity and forcing may differ by design.
+    This prevents an OOD result from silently mixing changes in the numerical
+    grid or prediction horizon with changes in the data distribution.
     """
 
     specs = (train, validation, ood)
