@@ -127,6 +127,11 @@ benchmark.
 
 ### Lot M3 — Jeux d'EDP et solveurs de vérité terrain
 
+Le solveur Burgers 1D périodique de référence est maintenant implémenté dans
+`src/neural_operator_reference/burgers.py`. Il utilise RK4, le produit
+anti-aliasé et des contrôles de moyenne et d'énergie. La génération de datasets
+pour l'apprentissage FNO/PINO reste à faire.
+
 Ordre recommandé :
 
 1. Burgers 1D périodique : test de base et résidu non linéaire ;

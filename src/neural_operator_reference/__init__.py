@@ -14,6 +14,13 @@ from .spectral import (
 )
 from .linear_operator import FourierMultiplier1D
 from .fno1d import FNOFitResult, NumpyFNO1D
+from .burgers import (
+    burgers_rhs,
+    burgers_rk4_step,
+    integrate_burgers,
+    periodic_energy,
+    periodic_mean,
+)
 
 __all__ = [
     "burgers_residual",
@@ -29,4 +36,9 @@ __all__ = [
     "FourierMultiplier1D",
     "FNOFitResult",
     "NumpyFNO1D",
+    "burgers_rhs",
+    "burgers_rk4_step",
+    "integrate_burgers",
+    "periodic_energy",
+    "periodic_mean",
 ]
