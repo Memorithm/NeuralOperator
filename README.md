@@ -19,6 +19,8 @@ machine learning :
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
 - baseline convolutionnelle locale périodique ajustée par moindres carrés ;
 - référence DeepONet séparable à trunk Fourier fixe ;
+- évaluation récursive multi-pas avec erreur, résidu et écarts de conservation ;
+- partitions déterministes train/validation/OOD avec provenance des paramètres ;
 - tests déterministes sur fonctions analytiques.
 
 Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
@@ -43,6 +45,8 @@ PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
 PYTHONPATH=src python3 scripts/burgers_resolution_baseline_experiment.py
 PYTHONPATH=src python3 scripts/deeponet_experiment.py
+PYTHONPATH=src python3 scripts/burgers_rollout_experiment.py
+PYTHONPATH=src python3 scripts/burgers_split_experiment.py
 ```
 
 Dépendances utilisées : NumPy et SciPy. Aucun téléchargement de données ni
@@ -65,3 +69,10 @@ L'expérience FNO est volontairement synthétique : elle vérifie le contrat
 spectral et le transfert de résolution sur un opérateur linéaire à modes bas.
 Elle ne constitue pas encore une validation sur une EDP ni une comparaison de
 performance avec PyTorch.
+
+
+## Licence
+
+Le code source est disponible sous la [licence PolyForm Noncommercial 1.0.0](LICENSE.md). L’usage commercial n’est pas accordé par cette licence. Consultez [LICENSING.md](LICENSING.md) pour la voie de licence commerciale séparée.
+
+Copyright © 2026 Tarek Zekriti.
