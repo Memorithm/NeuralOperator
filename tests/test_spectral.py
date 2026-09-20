@@ -13,6 +13,7 @@ from neural_operator_reference import (  # noqa: E402
     burgers_rhs,
     burgers_data_physics_loss,
     burgers_transition_physics_loss,
+    fit_fno_burgers_physics,
     generate_burgers_dataset,
     integrate_burgers,
     burgers_residual,
@@ -270,6 +271,23 @@ class SpectralReferenceTests(unittest.TestCase):
             ),
             1.0e-24,
         )
+
+    def test_physics_aware_training_reduces_weighted_transition_loss(self):
+        train = generate_burgers_dataset(
+            samples=2, points=16, dt=2.0e-4, steps=3, viscosity=0.05, seed=5
+        )
+        model = NumpyFNO1D(width=3, modes=5, seed=4)
+        result = fit_fno_burgers_physics(
+            model,
+            train.inputs,
+            train.targets,
+            horizon=train.dt * train.steps,
+            viscosity=train.viscosity,
+            physics_weight=1.0e-3,
+            maxiter=20,
+        )
+        self.assertLess(result.final_total_loss, result.initial_total_loss)
+        self.assertLess(result.final_physics_loss, result.initial_physics_loss)
 
 
 if __name__ == "__main__":

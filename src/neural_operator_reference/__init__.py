@@ -27,6 +27,7 @@ from .physics import (
     burgers_transition_physics_loss,
     burgers_transition_residual,
 )
+from .training import PhysicsFitResult, fit_fno_burgers_physics
 
 __all__ = [
     "burgers_residual",
@@ -53,4 +54,6 @@ __all__ = [
     "burgers_data_physics_loss",
     "burgers_transition_physics_loss",
     "burgers_transition_residual",
+    "PhysicsFitResult",
+    "fit_fno_burgers_physics",
 ]
