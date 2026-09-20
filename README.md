@@ -13,6 +13,7 @@ machine learning :
 - masque et produit anti-aliasés selon la règle des `2/3` ;
 - baseline d'opérateur de Fourier linéaire ajustée par moindres carrés ;
 - FNO 1D minimal entraînable par SciPy pour validation de protocole ;
+- solveur de référence Burgers 1D périodique par RK4 avec anti-aliasing ;
 - tests déterministes sur fonctions analytiques.
 
 Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
@@ -31,6 +32,7 @@ cd NeuralOperator
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 scripts/reference_experiment.py
 PYTHONPATH=src python3 scripts/fno_experiment.py
+PYTHONPATH=src python3 scripts/burgers_benchmark.py
 ```
 
 Dépendances utilisées : NumPy et SciPy. Aucun téléchargement de données ni
@@ -38,9 +40,9 @@ aucun accès réseau n'est nécessaire pour ces vérifications.
 
 ## Prochain jalon
 
-Ajouter un benchmark d'opérateur 1D périodique basé sur Burgers avec :
+Étendre le benchmark d'opérateur 1D périodique basé sur Burgers avec :
 
-1. solveur de référence contrôlé ;
+1. données générées par le solveur de référence contrôlé ;
 2. baseline interpolation/conv1d ;
 3. FNO entraînable sur données d'EDP ;
 4. pertes données + résidu PDE ;

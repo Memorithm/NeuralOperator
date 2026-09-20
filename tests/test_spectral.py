@@ -10,6 +10,8 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 from neural_operator_reference import (  # noqa: E402
     FourierMultiplier1D,
     NumpyFNO1D,
+    burgers_rhs,
+    integrate_burgers,
     burgers_residual,
     central_difference_periodic,
     dealias_mask,
@@ -192,6 +194,31 @@ class SpectralReferenceTests(unittest.TestCase):
         fine_inputs = np.asarray(fine_inputs)
         fine_targets = np.asarray(fine_targets)
         self.assertLess(model.loss(fine_inputs, fine_targets), 5.0e-4)
+
+    def test_burgers_solver_preserves_mean_and_dissipates_energy(self):
+        n = 64
+        length = 2.0 * np.pi
+        x = np.arange(n) * length / n
+        initial = 0.2 + np.sin(x) + 0.25 * np.cos(2.0 * x)
+        trajectory = integrate_burgers(
+            initial,
+            dt=2.0e-4,
+            steps=40,
+            viscosity=0.05,
+            length=length,
+        )
+
+        means = np.mean(trajectory, axis=-1)
+        energies = 0.5 * np.mean(trajectory * trajectory, axis=-1)
+        self.assertLess(float(np.max(np.abs(means - means[0]))), 1.0e-11)
+        self.assertLess(float(energies[-1]), float(energies[0]))
+        self.assertLess(float(np.max(np.abs(burgers_rhs(np.ones(n), 0.1)))), 1.0e-12)
+
+    def test_burgers_solver_rejects_invalid_time_parameters(self):
+        with self.assertRaises(ValueError):
+            integrate_burgers(np.ones(16), dt=0.0, steps=1, viscosity=0.1)
+        with self.assertRaises(ValueError):
+            integrate_burgers(np.ones(16), dt=1.0e-3, steps=-1, viscosity=0.1)
 
 
 if __name__ == "__main__":
