@@ -15,6 +15,7 @@ machine learning :
 - FNO 1D minimal entraînable par SciPy pour validation de protocole ;
 - solveur de référence Burgers 1D périodique par RK4 avec anti-aliasing ;
 - génération déterministe de datasets Burgers avec métadonnées ;
+- diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - tests déterministes sur fonctions analytiques.
 
 Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,

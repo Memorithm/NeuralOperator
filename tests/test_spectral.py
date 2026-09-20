@@ -11,6 +11,8 @@ from neural_operator_reference import (  # noqa: E402
     FourierMultiplier1D,
     NumpyFNO1D,
     burgers_rhs,
+    burgers_data_physics_loss,
+    burgers_transition_physics_loss,
     generate_burgers_dataset,
     integrate_burgers,
     burgers_residual,
@@ -249,6 +251,25 @@ class SpectralReferenceTests(unittest.TestCase):
 
         self.assertLess(result.final_loss, result.initial_loss)
         self.assertLess(model.loss(held_out.inputs, held_out.targets), 1.0e-3)
+
+    def test_constant_burgers_transition_has_zero_physics_residual(self):
+        initial = np.full(32, 0.75)
+        total, data_mse, physics_mse = burgers_data_physics_loss(
+            initial,
+            initial,
+            initial,
+            horizon=0.1,
+            viscosity=0.05,
+        )
+        self.assertEqual(total, 0.0)
+        self.assertEqual(data_mse, 0.0)
+        self.assertLess(physics_mse, 1.0e-24)
+        self.assertLess(
+            burgers_transition_physics_loss(
+                initial, initial, horizon=0.1, viscosity=0.05
+            ),
+            1.0e-24,
+        )
 
 
 if __name__ == "__main__":

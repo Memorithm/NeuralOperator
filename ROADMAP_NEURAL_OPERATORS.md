@@ -151,6 +151,11 @@ automatiquement garanti.
 
 ### Lot M4 — PINO et invariants physiques
 
+Le diagnostic de transition Burgers est maintenant disponible dans
+`physics.py`. Il sépare l'erreur de données du résidu PDE, mais il ne constitue
+pas encore une perte PINO complète : la dérivée temporelle est ici une
+approximation entre deux états.
+
 - perte de données `L_data` ;
 - perte PDE `L_pde` ;
 - perte conditions initiales/limites `L_bc` ;
