@@ -123,9 +123,18 @@ la sortie FNO grossière à une évaluation directe du même FNO sur une entrée
 rééchantillonnée fine. La baseline ne prétend pas apprendre l'opérateur : elle
 mesure le coût de ne faire que transporter une prédiction déjà calculée.
 
+La baseline `PeriodicConv1D` dans `baselines.py` ajuste aussi un stencil local
+périodique par moindres carrés. Elle fournit un point de comparaison
+convolutionnel transparent, mais ses poids sont liés à la grille discrète et
+ne constituent donc pas une garantie de transfert de résolution. Sur le petit
+cas Burgers actuel, elle atteint environ `0,060 %` d'erreur relative à 32
+points, contre `1,87 %` pour le FNO évalué sur l'entrée fine exacte : ce
+contre-résultat indique que l'horizon et la famille de données sont trop
+simples pour attribuer un avantage au mélange spectral.
+
 Reste à faire dans M2 : remplacer l'optimisation par différences finies par un
-backend autodiff, ajouter DeepONet, puis comparer avec une baseline
-convolutionnelle et une baseline interpolation.
+backend autodiff et ajouter DeepONet, avec une séparation stricte des familles
+de paramètres et plusieurs graines.
 
 Le code de référence `neuraloperator` est utile pour comparer les résultats,
 mais il ne doit pas être confondu avec une implémentation Memorithm. Sa

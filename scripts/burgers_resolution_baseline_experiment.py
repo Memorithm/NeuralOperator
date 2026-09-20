@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Compare coarse-output interpolation with direct FNO resolution transfer."""
+"""Compare local convolution, interpolation, and FNO resolution transfer."""
 
 from __future__ import annotations
 
@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
 from neural_operator_reference import (  # noqa: E402
     NumpyFNO1D,
+    PeriodicConv1D,
     generate_burgers_dataset,
     periodic_linear_interpolate,
     relative_l2_error,
@@ -31,6 +32,8 @@ def main() -> None:
 
     model = NumpyFNO1D(width=3, modes=5, seed=4)
     fit = model.fit(train.inputs, train.targets, maxiter=60, tolerance=1.0e-7)
+    convolution = PeriodicConv1D(kernel_size=5)
+    convolution_fit = convolution.fit(train.inputs, train.targets)
     coarse_prediction = model(coarse.inputs)
     fine_inputs = periodic_linear_interpolate(coarse.inputs[..., 0], 32)[..., None]
     direct_fine_prediction = model(fine_inputs)
@@ -55,12 +58,23 @@ def main() -> None:
                     "final_loss": fit.final_loss,
                     "success": fit.success,
                 },
+                "convolution_fit": {
+                    "initial_loss": convolution_fit.initial_loss,
+                    "final_loss": convolution_fit.final_loss,
+                    "rank": convolution_fit.rank,
+                },
                 "coarse_fno_on_coarse_grid": metrics(coarse_prediction, coarse.targets),
                 "direct_fno_on_interpolated_fine_input": metrics(
                     direct_fine_prediction, fine.targets
                 ),
                 "direct_fno_on_exact_fine_input": metrics(
                     exact_fine_prediction, fine.targets
+                ),
+                "periodic_convolution_on_coarse_grid": metrics(
+                    convolution(coarse.inputs), coarse.targets
+                ),
+                "periodic_convolution_on_exact_fine_input": metrics(
+                    convolution(fine.inputs), fine.targets
                 ),
                 "interpolated_coarse_fno_output": metrics(
                     interpolated_prediction, fine.targets
