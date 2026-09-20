@@ -7,7 +7,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 
-from neural_operator_reference import TorchFNO1D  # noqa: E402
+from neural_operator_reference import NumpyFNO1D, TorchFNO1D  # noqa: E402
 
 
 try:
@@ -43,6 +43,28 @@ class TorchFNOTests(unittest.TestCase):
         self.assertLess(result.final_loss, result.initial_loss)
         self.assertLess(model.loss(inputs, targets), result.initial_loss)
 
+
+    def test_parameters_match_the_numpy_reference(self):
+        rng = np.random.default_rng(20260920)
+        inputs = rng.normal(size=(2, 12, 1))
+        numpy_model = NumpyFNO1D(width=3, modes=4, seed=4)
+        torch_model = TorchFNO1D(width=3, modes=4, seed=9)
+        torch_model.set_parameter_vector(numpy_model.parameter_vector())
+
+        numpy_output = numpy_model(inputs)
+        torch_output = torch_model(inputs).detach().cpu().numpy()
+
+        self.assertTrue(
+            np.allclose(torch_output, numpy_output, rtol=1.0e-11, atol=1.0e-11)
+        )
+        self.assertTrue(
+            np.allclose(
+                torch_model.parameter_vector(),
+                numpy_model.parameter_vector(),
+                rtol=0.0,
+                atol=0.0,
+            )
+        )
 
 if __name__ == "__main__":
     unittest.main()

@@ -82,6 +82,55 @@ if torch is not None:
                 torch.zeros(self.out_channels, dtype=torch.float64)
             )
 
+        def parameter_vector(self) -> np.ndarray:
+            """Flatten parameters in the same order as NumpyFNO1D."""
+
+            parameters = (
+                self.lift_weight,
+                self.lift_bias,
+                self.spectral_weight,
+                self.pointwise_weight,
+                self.pointwise_bias,
+                self.projection_weight,
+                self.projection_bias,
+            )
+            return np.concatenate(
+                [
+                    parameter.detach().cpu().numpy().ravel()
+                    for parameter in parameters
+                ]
+            )
+
+        def set_parameter_vector(self, vector: np.ndarray) -> None:
+            """Restore parameters from a NumpyFNO1D-compatible vector."""
+
+            vector = np.asarray(vector, dtype=float)
+            parameters = (
+                self.lift_weight,
+                self.lift_bias,
+                self.spectral_weight,
+                self.pointwise_weight,
+                self.pointwise_bias,
+                self.projection_weight,
+                self.projection_bias,
+            )
+            expected = sum(parameter.numel() for parameter in parameters)
+            if vector.size != expected:
+                raise ValueError(f"parameter vector must contain {expected} values")
+            offset = 0
+            with torch.no_grad():
+                for parameter in parameters:
+                    next_offset = offset + parameter.numel()
+                    values = vector[offset:next_offset].reshape(tuple(parameter.shape))
+                    parameter.copy_(
+                        torch.as_tensor(
+                            values,
+                            dtype=parameter.dtype,
+                            device=parameter.device,
+                        )
+                    )
+                    offset = next_offset
+
         def _inputs(self, inputs: np.ndarray | torch.Tensor) -> torch.Tensor:
             if isinstance(inputs, torch.Tensor):
                 tensor = inputs.to(
