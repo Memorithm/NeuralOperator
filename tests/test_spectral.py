@@ -10,6 +10,7 @@ sys.path.insert(0, str(Path(__file__).parents[1] / "src"))
 from neural_operator_reference import (  # noqa: E402
     FourierMultiplier1D,
     burgers_residual,
+    central_difference_periodic,
     dealias_mask,
     dealiased_product,
     divergence_2d,
@@ -123,6 +124,27 @@ class SpectralReferenceTests(unittest.TestCase):
         fine_targets = elliptic_response(fine_inputs)
         fine_predictions = operator.predict(fine_inputs)
         self.assertLess(relative_l2_error(fine_predictions, fine_targets), 1.0e-12)
+
+    def test_spectral_derivative_converges_faster_than_centered_difference(self):
+        length = 2.0 * np.pi
+        errors_spectral = []
+        errors_finite_difference = []
+        for n in (16, 32, 64):
+            x = np.arange(n) * length / n
+            field = np.exp(np.sin(x))
+            expected = np.cos(x) * np.exp(np.sin(x))
+            errors_spectral.append(
+                relative_l2_error(spectral_derivative(field, length=length), expected)
+            )
+            errors_finite_difference.append(
+                relative_l2_error(
+                    central_difference_periodic(field, length=length), expected
+                )
+            )
+
+        self.assertLess(errors_spectral[-1], errors_spectral[0] * 1.0e-4)
+        self.assertLess(errors_finite_difference[-1], errors_finite_difference[0])
+        self.assertLess(errors_spectral[-1], errors_finite_difference[-1])
 
 
 if __name__ == "__main__":

@@ -24,7 +24,7 @@ implémentation PyTorch puis Rust.
 Depuis la racine du workspace :
 
 ```bash
-cd /workspace/scratch/2bb440292a42/neural_operator_lab
+cd NeuralOperator
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 scripts/reference_experiment.py
 ```
