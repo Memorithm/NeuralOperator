@@ -23,6 +23,7 @@ from neural_operator_reference import (  # noqa: E402
     divergence_2d,
     incompressible_velocity_from_streamfunction,
     relative_l2_error,
+    periodic_linear_interpolate,
     spectral_derivative,
     spectral_filter,
 )
@@ -288,6 +289,21 @@ class SpectralReferenceTests(unittest.TestCase):
         )
         self.assertLess(result.final_total_loss, result.initial_total_loss)
         self.assertLess(result.final_physics_loss, result.initial_physics_loss)
+
+    def test_periodic_linear_interpolation_wraps_and_preserves_shape(self):
+        source_points = 16
+        target_points = 32
+        x = np.arange(source_points) * 2.0 * np.pi / source_points
+        source = np.stack([np.sin(x), 0.5 * np.cos(2.0 * x)])
+        interpolated = periodic_linear_interpolate(source, target_points)
+
+        self.assertEqual(interpolated.shape, (2, target_points))
+        self.assertTrue(np.allclose(interpolated[:, ::2], source))
+        fine_x = np.arange(target_points) * 2.0 * np.pi / target_points
+        expected = np.stack([np.sin(fine_x), 0.5 * np.cos(2.0 * fine_x)])
+        self.assertLess(relative_l2_error(interpolated, expected), 3.0e-2)
+        constant = periodic_linear_interpolate(np.full(source_points, 0.75), 23)
+        self.assertTrue(np.allclose(constant, 0.75))
 
 
 if __name__ == "__main__":
