@@ -130,7 +130,8 @@ benchmark.
 Le solveur Burgers 1D périodique de référence est maintenant implémenté dans
 `src/neural_operator_reference/burgers.py`. Il utilise RK4, le produit
 anti-aliasé et des contrôles de moyenne et d'énergie. La génération de datasets
-pour l'apprentissage FNO/PINO reste à faire.
+déterministe est maintenant disponible dans `datasets.py`, et un premier FNO
+est entraîné sur Burgers dans `scripts/burgers_fno_experiment.py`.
 
 Ordre recommandé :
 
@@ -141,6 +142,12 @@ Ordre recommandé :
 
 Chaque dataset doit enregistrer l'équation, les paramètres, la résolution, les
 conditions initiales/limites, la méthode numérique et la tolérance du solveur.
+
+Le premier cas Burgers est contrôlé mais volontairement petit : 4 trajectoires
+à 16 points pour l'apprentissage, 2 trajectoires retenues à 16 points et une
+évaluation exploratoire à 32 points. L'erreur relative observée à 32 points est
+environ `6,9 %`; ce résultat montre que le transfert de résolution n'est pas
+automatiquement garanti.
 
 ### Lot M4 — PINO et invariants physiques
 

@@ -11,6 +11,7 @@ from neural_operator_reference import (  # noqa: E402
     FourierMultiplier1D,
     NumpyFNO1D,
     burgers_rhs,
+    generate_burgers_dataset,
     integrate_burgers,
     burgers_residual,
     central_difference_periodic,
@@ -219,6 +220,35 @@ class SpectralReferenceTests(unittest.TestCase):
             integrate_burgers(np.ones(16), dt=0.0, steps=1, viscosity=0.1)
         with self.assertRaises(ValueError):
             integrate_burgers(np.ones(16), dt=1.0e-3, steps=-1, viscosity=0.1)
+
+    def test_burgers_dataset_is_deterministic_and_traceable(self):
+        first = generate_burgers_dataset(
+            samples=3, points=32, dt=2.0e-4, steps=3, viscosity=0.05, seed=17
+        )
+        second = generate_burgers_dataset(
+            samples=3, points=32, dt=2.0e-4, steps=3, viscosity=0.05, seed=17
+        )
+        self.assertEqual(first.inputs.shape, (3, 32, 1))
+        self.assertEqual(first.targets.shape, (3, 32, 1))
+        self.assertEqual(first.resolution, 32)
+        self.assertEqual(first.samples, 3)
+        self.assertEqual(first.steps, 3)
+        self.assertTrue(np.array_equal(first.inputs, second.inputs))
+        self.assertTrue(np.array_equal(first.targets, second.targets))
+        self.assertLess(float(np.max(np.abs(first.inputs - first.targets))), 0.1)
+
+    def test_fno_learns_a_small_burgers_operator(self):
+        train = generate_burgers_dataset(
+            samples=4, points=16, dt=2.0e-4, steps=3, viscosity=0.05, seed=1
+        )
+        held_out = generate_burgers_dataset(
+            samples=2, points=16, dt=2.0e-4, steps=3, viscosity=0.05, seed=2
+        )
+        model = NumpyFNO1D(width=3, modes=5, seed=4)
+        result = model.fit(train.inputs, train.targets, maxiter=60, tolerance=1.0e-7)
+
+        self.assertLess(result.final_loss, result.initial_loss)
+        self.assertLess(model.loss(held_out.inputs, held_out.targets), 1.0e-3)
 
 
 if __name__ == "__main__":

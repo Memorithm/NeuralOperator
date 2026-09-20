@@ -14,6 +14,7 @@ machine learning :
 - baseline d'opérateur de Fourier linéaire ajustée par moindres carrés ;
 - FNO 1D minimal entraînable par SciPy pour validation de protocole ;
 - solveur de référence Burgers 1D périodique par RK4 avec anti-aliasing ;
+- génération déterministe de datasets Burgers avec métadonnées ;
 - tests déterministes sur fonctions analytiques.
 
 Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
@@ -33,6 +34,8 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 scripts/reference_experiment.py
 PYTHONPATH=src python3 scripts/fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_benchmark.py
+PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
+PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 ```
 
 Dépendances utilisées : NumPy et SciPy. Aucun téléchargement de données ni
