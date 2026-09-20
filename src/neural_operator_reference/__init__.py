@@ -2,6 +2,7 @@
 
 from .spectral import (
     burgers_residual,
+    central_difference_periodic,
     dealias_mask,
     dealiased_product,
     divergence_2d,
@@ -15,6 +16,7 @@ from .linear_operator import FourierMultiplier1D
 
 __all__ = [
     "burgers_residual",
+    "central_difference_periodic",
     "dealias_mask",
     "dealiased_product",
     "divergence_2d",
