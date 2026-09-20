@@ -37,8 +37,9 @@ def fit_fno_burgers_physics(
     length: float = 2.0 * np.pi,
     maxiter: int = 60,
     tolerance: float = 1.0e-8,
+    forcing: float | np.ndarray | None = None,
 ) -> PhysicsFitResult:
-    """Fit a tiny FNO against data and a Burgers transition residual.
+    """Fit a tiny FNO against data and a forced Burgers residual.
 
     This uses finite-difference optimization and a one-transition temporal
     approximation. It is a reference experiment for loss accounting, not a
@@ -75,6 +76,7 @@ def fit_fno_burgers_physics(
             data_weight=data_weight,
             physics_weight=physics_weight,
             length=length,
+            forcing=forcing,
         )
 
     initial_total, initial_data, initial_physics = evaluate()

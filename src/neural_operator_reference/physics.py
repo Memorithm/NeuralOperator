@@ -13,11 +13,12 @@ def burgers_transition_residual(
     horizon: float,
     viscosity: float,
     length: float = 2.0 * np.pi,
+    forcing: float | np.ndarray | None = None,
 ) -> np.ndarray:
-    """Approximate the Burgers residual over one predicted transition.
+    """Approximate the forced Burgers residual over one transition.
 
     The temporal derivative is approximated by
-    ``(predicted_field - initial_field) / horizon`` and evaluated against the
+    (predicted_field - initial_field) / horizon and evaluated against the
     spatial RHS at the predicted state. This is a diagnostic for a one-step
     operator, not a replacement for a time-continuous PINO formulation.
     """
@@ -35,6 +36,7 @@ def burgers_transition_residual(
         predicted_field,
         viscosity=viscosity,
         length=length,
+        forcing=forcing,
     )
 
 
@@ -44,8 +46,9 @@ def burgers_transition_physics_loss(
     horizon: float,
     viscosity: float,
     length: float = 2.0 * np.pi,
+    forcing: float | np.ndarray | None = None,
 ) -> float:
-    """Return the mean squared transition residual."""
+    """Return the mean squared forced Burgers transition residual."""
 
     residual = burgers_transition_residual(
         initial_field,
@@ -53,6 +56,7 @@ def burgers_transition_physics_loss(
         horizon=horizon,
         viscosity=viscosity,
         length=length,
+        forcing=forcing,
     )
     return float(np.mean(residual * residual))
 
@@ -66,8 +70,9 @@ def burgers_data_physics_loss(
     data_weight: float = 1.0,
     physics_weight: float = 1.0,
     length: float = 2.0 * np.pi,
+    forcing: float | np.ndarray | None = None,
 ) -> tuple[float, float, float]:
-    """Return ``(total, data_mse, physics_mse)`` for a transition."""
+    """Return (total, data_mse, physics_mse) for a transition."""
 
     predicted_field, target_field = np.broadcast_arrays(
         np.asarray(predicted_field, dtype=float), np.asarray(target_field, dtype=float)
@@ -83,6 +88,7 @@ def burgers_data_physics_loss(
         horizon=horizon,
         viscosity=viscosity,
         length=length,
+        forcing=forcing,
     )
     total = float(data_weight) * data_mse + float(physics_weight) * physics_mse
     return total, data_mse, physics_mse

@@ -22,9 +22,9 @@ The specifications retain independent:
 - initial-condition amplitude;
 - viscosity.
 
-The current OOD protocol therefore tests a controlled shift in the initial
-condition family and viscosity. It does not yet test external forcing; that
-requires an explicit forcing contract in the reference solver.
+The current OOD protocol tests a controlled shift in the initial-condition
+family, viscosity, and a static sinusoidal forcing field. Time-dependent
+forcing remains outside the reference solver contract.
 
 ## Reproduction
 

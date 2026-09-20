@@ -48,6 +48,8 @@ def main() -> None:
         seed=3,
         modes=6,
         amplitude=0.35,
+        forcing_amplitude=0.2,
+        forcing_mode=2,
         **common,
     )
     split = generate_burgers_split(train_spec, validation_spec, ood_spec)
@@ -71,6 +73,7 @@ def main() -> None:
             steps=5,
             viscosity=dataset.viscosity,
             length=dataset.length,
+            forcing=dataset.forcing,
         )
         _, metrics = evaluate_burgers_operator(
             model,
@@ -79,6 +82,7 @@ def main() -> None:
             horizon=dataset.horizon,
             viscosity=dataset.viscosity,
             length=dataset.length,
+            forcing=dataset.forcing,
         )
         reports[name] = {
             "spec": split.as_dict()[name],

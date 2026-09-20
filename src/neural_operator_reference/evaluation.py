@@ -121,6 +121,7 @@ def evaluate_burgers_rollout(
     horizon: float,
     viscosity: float,
     length: float = 2.0 * np.pi,
+    forcing: np.ndarray | float | None = None,
 ) -> BurgersRolloutMetrics:
     """Evaluate a predicted trajectory against a reference trajectory.
 
@@ -181,6 +182,7 @@ def evaluate_burgers_rollout(
             horizon=horizon,
             viscosity=viscosity,
             length=length,
+            forcing=forcing,
         )
         for step in range(predicted_trajectory.shape[0] - 1)
     )
@@ -203,6 +205,7 @@ def evaluate_burgers_operator(
     horizon: float,
     viscosity: float,
     length: float = 2.0 * np.pi,
+    forcing: np.ndarray | float | None = None,
 ) -> tuple[np.ndarray, BurgersRolloutMetrics]:
     """Roll out an operator and evaluate it against a supplied trajectory."""
 

@@ -22,6 +22,9 @@ class BurgersDataset:
     seed: int
     modes: int = 4
     amplitude: float = 0.5
+    forcing_amplitude: float = 0.0
+    forcing_mode: int = 1
+    forcing: np.ndarray | None = None
 
     @property
     def resolution(self) -> int:
@@ -70,6 +73,27 @@ def random_periodic_fields(
     return fields
 
 
+def periodic_forcing_field(
+    points: int,
+    length: float = 2.0 * np.pi,
+    amplitude: float = 0.0,
+    mode: int = 1,
+) -> np.ndarray:
+    """Create a static sinusoidal forcing field on the periodic grid."""
+
+    if not isinstance(points, (int, np.integer)) or points < 4:
+        raise ValueError("points must be an integer greater than or equal to 4")
+    if not np.isfinite(length) or length <= 0.0:
+        raise ValueError("length must be finite and strictly positive")
+    if not np.isfinite(amplitude) or amplitude < 0.0:
+        raise ValueError("amplitude must be finite and non-negative")
+    if not isinstance(mode, (int, np.integer)) or mode <= 0 or mode >= points // 2:
+        raise ValueError("mode must be positive and below the Nyquist limit")
+
+    x = np.arange(int(points), dtype=float) * float(length) / int(points)
+    return float(amplitude) * np.sin(2.0 * np.pi * int(mode) * x / float(length))
+
+
 def generate_burgers_dataset(
     samples: int,
     points: int,
@@ -80,6 +104,8 @@ def generate_burgers_dataset(
     length: float = 2.0 * np.pi,
     modes: int = 4,
     amplitude: float = 0.5,
+    forcing_amplitude: float = 0.0,
+    forcing_mode: int = 1,
 ) -> BurgersDataset:
     """Generate u(0) -> u(steps*dt) pairs with full provenance."""
 
@@ -91,12 +117,19 @@ def generate_burgers_dataset(
         length=length,
         amplitude=amplitude,
     )
+    forcing = periodic_forcing_field(
+        points=points,
+        length=length,
+        amplitude=forcing_amplitude,
+        mode=forcing_mode,
+    )
     trajectory = integrate_burgers(
         initial_fields,
         dt=dt,
         steps=steps,
         viscosity=viscosity,
         length=length,
+        forcing=forcing,
     )
     return BurgersDataset(
         inputs=initial_fields[..., None],
@@ -108,4 +141,7 @@ def generate_burgers_dataset(
         seed=int(seed),
         modes=int(modes),
         amplitude=float(amplitude),
+        forcing_amplitude=float(forcing_amplitude),
+        forcing_mode=int(forcing_mode),
+        forcing=forcing,
     )
