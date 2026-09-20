@@ -19,7 +19,8 @@ Cargo et PyTorch ne sont pas disponibles dans cet environnement.
 
 Le premier lot implémenté se trouve dans `neural_operator_lab/`. Il valide les
 opérations numériques qui seront réutilisées par le FNO/PINO, sans prétendre
-déjà fournir un modèle neuronal.
+déjà fournir un modèle neuronal. Le complément M1 compare désormais la
+convergence spectrale à une différence finie périodique sur une fonction lisse.
 
 ## 2. Évaluation scientifique de la note
 
@@ -85,10 +86,14 @@ un compromis documenté entre :
 
 Reste à faire dans M1 :
 
-- tests de convergence sur plusieurs tailles de grille ;
 - validation des bords non périodiques par une méthode distincte ;
 - comparaison avec différences finies et dérivation automatique lorsque le
   backend ML sera disponible.
+
+La convergence sur plusieurs tailles de grille et la comparaison avec la
+différence finie périodique sont implémentées dans
+`scripts/convergence_experiment.py`. La comparaison avec Autograd reste
+explicitement reportée jusqu'à l'ajout d'un backend ML.
 
 ### Lot M2 — Baselines d'apprentissage
 
