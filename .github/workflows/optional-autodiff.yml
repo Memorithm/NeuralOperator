@@ -17,6 +17,7 @@ on:
       - "scripts/torch_darcy_multiseed_scaling.py"
       - "scripts/torch_darcy_ood_families.py"
       - "scripts/torch_darcy_pino_resolution.py"
+      - "scripts/torch_darcy_scale_equivariance.py"
       - "src/neural_operator_reference/evaluation.py"
       - "scripts/torch_operator_comparison.py"
       - "scripts/torch_darcy_fno2d_experiment.py"
@@ -50,8 +51,11 @@ on:
       - "scripts/torch_darcy_multiseed_scaling.py"
       - "scripts/torch_darcy_ood_families.py"
       - "scripts/torch_darcy_pino_resolution.py"
+      - "scripts/torch_darcy_scale_equivariance.py"
+      - "src/neural_operator_reference/darcy_scaling.py"
       - "src/neural_operator_reference/darcy_datasets.py"
       - "tests/test_darcy_ood_families.py"
+      - "tests/test_darcy_scale_equivariance.py"
       - "tests/test_torch_darcy_comparison.py"
       - "tests/test_torch_darcy_physics.py"
       - "tests/test_torch_fno.py"
@@ -108,6 +112,10 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_darcy_pino_resolution.py > torch-darcy-pino-resolution.json
           cat torch-darcy-pino-resolution.json
+      - name: Run exact Darcy scale-equivariance benchmark
+        run: |
+          PYTHONPATH=src python scripts/torch_darcy_scale_equivariance.py > torch-darcy-scale-equivariance.json
+          cat torch-darcy-scale-equivariance.json
       - name: Upload benchmark evidence
         uses: actions/upload-artifact@v4
         with:
