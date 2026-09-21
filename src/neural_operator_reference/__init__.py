@@ -68,10 +68,12 @@ from .torch_deeponet2d import (
 from .benchmarking import (
     BurgersOneStepMetrics,
     Darcy2DMetrics,
+    ScalarSummary,
     InferenceTiming,
     benchmark_inference,
     evaluate_burgers_dataset,
     evaluate_darcy_dataset,
+    summarize_scalars,
     trainable_parameter_count,
 )
 from .torch_physics import (
@@ -148,10 +150,12 @@ __all__ = [
     "normalized_query_grid",
     "BurgersOneStepMetrics",
     "Darcy2DMetrics",
+    "ScalarSummary",
     "InferenceTiming",
     "benchmark_inference",
     "evaluate_burgers_dataset",
     "evaluate_darcy_dataset",
+    "summarize_scalars",
     "trainable_parameter_count",
     "TorchPhysicsFitResult",
     "fit_torch_fno_burgers_physics",
