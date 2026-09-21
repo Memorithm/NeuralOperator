@@ -7,11 +7,14 @@ on:
       - "src/neural_operator_reference/torch_fno1d.py"
       - "src/neural_operator_reference/torch_deeponet.py"
       - "src/neural_operator_reference/benchmarking.py"
+      - "src/neural_operator_reference/torch_physics.py"
+      - "scripts/torch_pino_experiment.py"
       - "src/neural_operator_reference/evaluation.py"
       - "scripts/torch_operator_comparison.py"
       - "tests/test_torch_fno.py"
       - "tests/test_torch_deeponet.py"
       - "tests/test_torch_benchmarking.py"
+      - "tests/test_torch_physics.py"
       - "tests/test_evaluation.py"
       - "requirements-autodiff.txt"
       - ".github/workflows/optional-autodiff.yml"
@@ -46,5 +49,9 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_operator_comparison.py > controlled-operator-benchmark.json
           cat controlled-operator-benchmark.json
+      - name: Run differentiable transition PINO benchmark
+        run: |
+          PYTHONPATH=src python scripts/torch_pino_experiment.py > torch-pino-benchmark.json
+          cat torch-pino-benchmark.json
       - name: Compile Python modules
         run: python -m compileall -q src tests scripts
