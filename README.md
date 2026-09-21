@@ -23,7 +23,9 @@ machine learning :
 - partitions déterministes train/validation/OOD avec provenance des paramètres ;
 - tests déterministes sur fonctions analytiques ;
 - benchmark contrôlé PyTorch FNO/DeepONet avec budget de paramètres quasi identique,
-  métriques validation/OOD/rollout et coût d'inférence.
+  métriques validation/OOD/rollout et coût d'inférence ;
+- résidu de Burgers spectral différentiable sous PyTorch et entraînement FNO
+  data+physique dans le graphe d'autograd.
 
 Le FNO NumPy/SciPy est un oracle de recherche volontairement petit et lent,
 entraîné par différences finies via SciPy. Il ne remplace pas encore un backend
@@ -50,6 +52,7 @@ PYTHONPATH=src python3 scripts/deeponet_experiment.py
 PYTHONPATH=src python3 scripts/burgers_rollout_experiment.py
 PYTHONPATH=src python3 scripts/burgers_split_experiment.py
 PYTHONPATH=src python3 scripts/torch_operator_comparison.py
+PYTHONPATH=src python3 scripts/torch_pino_experiment.py
 ```
 
 Dépendances utilisées : NumPy et SciPy. Aucun téléchargement de données ni
