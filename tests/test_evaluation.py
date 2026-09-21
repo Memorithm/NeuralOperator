@@ -61,6 +61,62 @@ class BurgersRolloutEvaluationTests(unittest.TestCase):
         self.assertLess(max(metrics.mean_abs_error_by_step), 1.0e-14)
         self.assertLess(max(metrics.energy_abs_error_by_step), 1.0e-14)
 
+    def test_operator_evaluation_propagates_static_forcing(self):
+        horizon = 2.0e-4
+        viscosity = 0.05
+        length = 2.0 * np.pi
+        points = 16
+        x = np.arange(points, dtype=float) * length / points
+        forcing = 0.2 * np.sin(2.0 * x)
+        initial_fields = random_periodic_fields(
+            samples=2,
+            points=points,
+            modes=3,
+            seed=22,
+            amplitude=0.2,
+            length=length,
+        )
+        reference = integrate_burgers(
+            initial_fields,
+            dt=horizon,
+            steps=2,
+            viscosity=viscosity,
+            length=length,
+            forcing=forcing,
+        )
+
+        def exact_operator(inputs):
+            return burgers_rk4_step(
+                inputs[..., 0],
+                dt=horizon,
+                viscosity=viscosity,
+                length=length,
+                forcing=forcing,
+            )[..., None]
+
+        _, with_forcing = evaluate_burgers_operator(
+            exact_operator,
+            initial_fields,
+            reference,
+            horizon=horizon,
+            viscosity=viscosity,
+            length=length,
+            forcing=forcing,
+        )
+        _, without_forcing = evaluate_burgers_operator(
+            exact_operator,
+            initial_fields,
+            reference,
+            horizon=horizon,
+            viscosity=viscosity,
+            length=length,
+        )
+
+        self.assertLess(
+            max(with_forcing.physics_mse_by_transition),
+            max(without_forcing.physics_mse_by_transition),
+        )
+
     def test_rollout_rejects_an_operator_with_the_wrong_shape(self):
         initial_fields = np.ones((1, 8), dtype=float)
 

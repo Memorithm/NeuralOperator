@@ -6,8 +6,13 @@ on:
     paths:
       - "src/neural_operator_reference/torch_fno1d.py"
       - "src/neural_operator_reference/torch_deeponet.py"
+      - "src/neural_operator_reference/benchmarking.py"
+      - "src/neural_operator_reference/evaluation.py"
+      - "scripts/torch_operator_comparison.py"
       - "tests/test_torch_fno.py"
       - "tests/test_torch_deeponet.py"
+      - "tests/test_torch_benchmarking.py"
+      - "tests/test_evaluation.py"
       - "requirements-autodiff.txt"
       - ".github/workflows/optional-autodiff.yml"
   pull_request:
@@ -37,5 +42,9 @@ jobs:
         run: python -m pip install --upgrade pip && python -m pip install -r requirements-autodiff.txt
       - name: Run optional backend tests
         run: PYTHONPATH=src python -m unittest discover -s tests -p "test_torch_*.py" -v
+      - name: Run controlled operator benchmark
+        run: |
+          PYTHONPATH=src python scripts/torch_operator_comparison.py > controlled-operator-benchmark.json
+          cat controlled-operator-benchmark.json
       - name: Compile Python modules
         run: python -m compileall -q src tests scripts

@@ -227,5 +227,6 @@ def evaluate_burgers_operator(
         horizon=horizon,
         viscosity=viscosity,
         length=length,
+        forcing=forcing,
     )
     return predicted_trajectory, metrics
