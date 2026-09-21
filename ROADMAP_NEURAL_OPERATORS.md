@@ -41,9 +41,16 @@ initialization seeds, a fixed architecture and identical weight candidates.
 This measures whether the data/physics trade-off is resolution-sensitive
 instead of assuming one global physics coefficient.
 
+The coefficient-family benchmark exposed a distinct weakness under global
+permeability-scale shifts. For scalar Darcy with fixed forcing and homogeneous
+Dirichlet pressure, this symmetry is exact: k=c*k_hat implies u=u_hat/c.
+The pipeline now factors the per-sample geometric-mean coefficient scale,
+trains on scale-normalized permeability/pressure, and restores physical
+pressure analytically without adding trainable parameters.
+
 The next gate is anisotropic coefficients and non-rectangular/boundary-condition
-shifts. If the conclusions remain stable, the program can move to
-advection-diffusion with the same evidence protocol.
+shifts, followed by discontinuous facies. If those remain controlled, the
+program can move to advection-diffusion with the same evidence protocol.
 
 ---
 ## Previous checkpoint — 20 September 2026
