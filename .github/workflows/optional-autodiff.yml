@@ -15,6 +15,7 @@ on:
       - "scripts/torch_pino_experiment.py"
       - "scripts/torch_darcy_pino_experiment.py"
       - "scripts/torch_darcy_multiseed_scaling.py"
+      - "scripts/torch_darcy_ood_families.py"
       - "src/neural_operator_reference/evaluation.py"
       - "scripts/torch_operator_comparison.py"
       - "scripts/torch_darcy_fno2d_experiment.py"
@@ -46,6 +47,9 @@ on:
       - "scripts/torch_darcy_operator_comparison.py"
       - "scripts/torch_darcy_pino_experiment.py"
       - "scripts/torch_darcy_multiseed_scaling.py"
+      - "scripts/torch_darcy_ood_families.py"
+      - "src/neural_operator_reference/darcy_datasets.py"
+      - "tests/test_darcy_ood_families.py"
       - "tests/test_torch_darcy_comparison.py"
       - "tests/test_torch_darcy_physics.py"
       - "tests/test_torch_fno.py"
@@ -94,5 +98,9 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_darcy_multiseed_scaling.py > torch-darcy-multiseed-scaling.json
           cat torch-darcy-multiseed-scaling.json
+      - name: Run Darcy coefficient-family OOD study
+        run: |
+          PYTHONPATH=src python scripts/torch_darcy_ood_families.py > torch-darcy-ood-families.json
+          cat torch-darcy-ood-families.json
       - name: Compile Python modules
         run: python -m compileall -q src tests scripts
