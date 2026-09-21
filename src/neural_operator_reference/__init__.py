@@ -58,7 +58,13 @@ from .evaluation import (
 )
 from .torch_fno1d import TorchFNO1D, TorchFNOFitResult
 from .torch_fno2d import TorchFNO2D, TorchFNO2DFitResult
+from .torch_localconv2d import TorchLocalConv2D, TorchLocalConv2DFitResult
 from .torch_deeponet import TorchDeepONet1D, TorchDeepONetFitResult
+from .torch_deeponet2d import (
+    TorchDeepONet2D,
+    TorchDeepONet2DFitResult,
+    normalized_query_grid,
+)
 from .benchmarking import (
     BurgersOneStepMetrics,
     Darcy2DMetrics,
@@ -128,8 +134,13 @@ __all__ = [
     "TorchFNOFitResult",
     "TorchFNO2D",
     "TorchFNO2DFitResult",
+    "TorchLocalConv2D",
+    "TorchLocalConv2DFitResult",
     "TorchDeepONet1D",
     "TorchDeepONetFitResult",
+    "TorchDeepONet2D",
+    "TorchDeepONet2DFitResult",
+    "normalized_query_grid",
     "BurgersOneStepMetrics",
     "Darcy2DMetrics",
     "InferenceTiming",
