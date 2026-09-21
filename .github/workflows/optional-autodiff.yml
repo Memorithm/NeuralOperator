@@ -14,6 +14,7 @@ on:
       - "src/neural_operator_reference/torch_darcy_physics.py"
       - "scripts/torch_pino_experiment.py"
       - "scripts/torch_darcy_pino_experiment.py"
+      - "scripts/torch_darcy_multiseed_scaling.py"
       - "src/neural_operator_reference/evaluation.py"
       - "scripts/torch_operator_comparison.py"
       - "scripts/torch_darcy_fno2d_experiment.py"
@@ -44,6 +45,7 @@ on:
       - "src/neural_operator_reference/torch_darcy_physics.py"
       - "scripts/torch_darcy_operator_comparison.py"
       - "scripts/torch_darcy_pino_experiment.py"
+      - "scripts/torch_darcy_multiseed_scaling.py"
       - "tests/test_torch_darcy_comparison.py"
       - "tests/test_torch_darcy_physics.py"
       - "tests/test_torch_fno.py"
@@ -88,5 +90,9 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_darcy_pino_experiment.py > torch-darcy-pino-benchmark.json
           cat torch-darcy-pino-benchmark.json
+      - name: Run Darcy multi-seed sample scaling
+        run: |
+          PYTHONPATH=src python scripts/torch_darcy_multiseed_scaling.py > torch-darcy-multiseed-scaling.json
+          cat torch-darcy-multiseed-scaling.json
       - name: Compile Python modules
         run: python -m compileall -q src tests scripts
