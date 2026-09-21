@@ -31,9 +31,15 @@ an explicit zero-weight data-only control. The matched-budget architecture
 comparison is now also repeated over three training-set sizes and three paired
 replicates, with raw runs plus mean/sample-standard-deviation summaries.
 
-The next gate is resolution-aware physics weighting and broader OOD coefficient
-families. If the multi-seed conclusions remain stable under those changes, the
-program can move to advection-diffusion with the same evidence protocol.
+The Darcy generator now exposes a provenance-preserving spectral-decay
+parameter. The OOD benchmark evaluates fixed families that separately shift
+coefficient contrast, spectral roughness/smoothness and mean permeability,
+with three model/training replicates and shared evaluation cohorts.
+
+The next gate is resolution-aware physics weighting, followed by anisotropic
+coefficients and non-rectangular/boundary-condition shifts. If the conclusions
+remain stable, the program can move to advection-diffusion with the same
+evidence protocol.
 
 ---
 ## Previous checkpoint — 20 September 2026
