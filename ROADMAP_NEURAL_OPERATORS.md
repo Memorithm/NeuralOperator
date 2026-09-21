@@ -9,15 +9,20 @@ differentiable spectral transition-PINO training path. The transition PINO
 still uses a finite temporal transition quotient; it is not a continuous-time
 collocation residual.
 
-The current tranche adds the second PDE truth family: a conservative 2D Darcy
-solver for -div(k grad u) = f with strictly positive variable permeability,
-homogeneous Dirichlet boundaries, deterministic permeability datasets,
-discrete-residual checks, and an analytic convergence benchmark.
+The current Darcy tranche now contains both the conservative 2D truth solver
+and a first trainable PyTorch FNO 2D. The model appends coordinates, mixes
+complex low Fourier modes, accepts new grid resolutions without changing
+weights, and imposes homogeneous Dirichlet boundaries with a hard analytic
+output envelope.
 
-The next technical gate is a trainable 2D operator on the Darcy
-permeability-to-pressure mapping, followed by controlled FNO/DeepONet/local
-baseline comparison, resolution transfer and OOD coefficient tests. No broad
-performance or resolution-invariance claim is made at this stage.
+The benchmark separates held-out validation, OOD coefficient contrast and
+zero-shot finer-grid execution while reporting error, discrete Darcy residual,
+boundary violation, inference timing and parameter count. Shape compatibility
+across resolutions is not treated as proof of resolution invariance.
+
+The next gate is a matched-budget local 2D baseline and nonlinear DeepONet 2D,
+then a differentiable Darcy residual for data-only versus physics-informed
+training before moving to advection-diffusion.
 
 ---
 ## Previous checkpoint — 20 September 2026
@@ -194,7 +199,7 @@ Le deuxième problème de vérité terrain est maintenant initialisé avec Darcy
 moyennes harmoniques aux faces et conditions de Dirichlet homogènes.
 `darcy_datasets.py` produit des champs de perméabilité positifs et déterministes,
 et `scripts/darcy_benchmark.py` mesure convergence analytique et résidu discret.
-Un opérateur neuronal 2D entraînable n'est pas encore inclus dans ce lot.
+Un premier opérateur 2D entraînable est désormais inclus dans torch_fno2d.py, avec benchmark IID/OOD/multi-résolution versionné.
 
 Ordre recommandé :
 
