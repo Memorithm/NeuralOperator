@@ -22,6 +22,7 @@ machine learning :
 - étude multi-seed et sample-scaling pour FNO 2D, DeepONet 2D et convolution locale ;
 - familles OOD Darcy contrôlées par contraste, rugosité spectrale et échelle moyenne de perméabilité ;
 - étude de sensibilité du poids PINO Darcy entre grilles 9×9 et 17×17 ;
+- normalisation exacte de l'échelle globale de perméabilité pour imposer la covariance Darcy k→c·k, u→u/c ;
 - génération déterministe de datasets Burgers avec métadonnées ;
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
@@ -59,6 +60,7 @@ PYTHONPATH=src python3 scripts/torch_darcy_pino_experiment.py
 PYTHONPATH=src python3 scripts/torch_darcy_multiseed_scaling.py
 PYTHONPATH=src python3 scripts/torch_darcy_ood_families.py
 PYTHONPATH=src python3 scripts/torch_darcy_pino_resolution.py
+PYTHONPATH=src python3 scripts/torch_darcy_scale_equivariance.py
 PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
 PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
@@ -84,8 +86,8 @@ apprend désormais le mapping perméabilité -> pression sur grille rectangulair
 
 La suite technique est maintenant :
 
-1. tester le scaling de résolution et la stabilité des conclusions multi-seed ;
-2. étendre les familles OOD à l'anisotropie et aux géométries non rectangulaires ;
+1. étendre les familles OOD à l'anisotropie et aux géométries non rectangulaires ;
+2. tester des champs à discontinuités/facies et des conditions aux limites mixtes ;
 3. ajouter advection-diffusion avec le même protocole de preuve ;
 4. ajouter advection-diffusion avant Navier-Stokes 2D ;
 5. ne porter vers Rust/SciRust que les noyaux acceptés par les oracles numériques.
