@@ -15,14 +15,16 @@ complex low Fourier modes, accepts new grid resolutions without changing
 weights, and imposes homogeneous Dirichlet boundaries with a hard analytic
 output envelope.
 
-The benchmark separates held-out validation, OOD coefficient contrast and
-zero-shot finer-grid execution while reporting error, discrete Darcy residual,
-boundary violation, inference timing and parameter count. Shape compatibility
-across resolutions is not treated as proof of resolution invariance.
+The benchmark now also contains matched-budget 2D comparators: a nonlinear
+DeepONet using the 9x9 permeability grid as branch sensors and a local
+coordinate-aware convolution baseline. The reference parameter counts are
+8,449 (FNO), 8,649 (DeepONet) and 8,672 (local convolution), with identical
+training samples, validation/OOD cohorts and Adam step counts.
 
-The next gate is a matched-budget local 2D baseline and nonlinear DeepONet 2D,
-then a differentiable Darcy residual for data-only versus physics-informed
-training before moving to advection-diffusion.
+Training wall time is recorded separately because equal optimizer steps do not
+imply equal compute. The next gate is multi-seed and sample-scaling evidence,
+followed by a differentiable Darcy residual for data-only versus
+physics-informed training before moving to advection-diffusion.
 
 ---
 ## Previous checkpoint — 20 September 2026
