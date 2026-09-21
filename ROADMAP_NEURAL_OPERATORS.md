@@ -22,9 +22,14 @@ coordinate-aware convolution baseline. The reference parameter counts are
 training samples, validation/OOD cohorts and Adam step counts.
 
 Training wall time is recorded separately because equal optimizer steps do not
-imply equal compute. The next gate is multi-seed and sample-scaling evidence,
-followed by a differentiable Darcy residual for data-only versus
-physics-informed training before moving to advection-diffusion.
+imply equal compute. A differentiable conservative Darcy residual now mirrors
+the SciPy truth stencil inside PyTorch autograd, and the FNO training path
+reports data, physics and weighted total losses separately.
+
+The first PINO experiment is a controlled physics-weight sensitivity sweep with
+an explicit zero-weight data-only control. The next gate is multi-seed and
+sample-scaling evidence, resolution-aware physics weighting and broader OOD
+coefficient families before moving to advection-diffusion.
 
 ---
 ## Previous checkpoint — 20 September 2026
