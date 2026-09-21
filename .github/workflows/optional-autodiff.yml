@@ -5,13 +5,16 @@ on:
     branches: [main, "research/**"]
     paths:
       - "src/neural_operator_reference/torch_fno1d.py"
+      - "src/neural_operator_reference/torch_fno2d.py"
       - "src/neural_operator_reference/torch_deeponet.py"
       - "src/neural_operator_reference/benchmarking.py"
       - "src/neural_operator_reference/torch_physics.py"
       - "scripts/torch_pino_experiment.py"
       - "src/neural_operator_reference/evaluation.py"
       - "scripts/torch_operator_comparison.py"
+      - "scripts/torch_darcy_fno2d_experiment.py"
       - "tests/test_torch_fno.py"
+      - "tests/test_torch_fno2d.py"
       - "tests/test_torch_deeponet.py"
       - "tests/test_torch_benchmarking.py"
       - "tests/test_torch_physics.py"
@@ -22,6 +25,12 @@ on:
     branches: [main]
     paths:
       - "src/neural_operator_reference/torch_fno1d.py"
+      - "src/neural_operator_reference/torch_fno2d.py"
+      - "src/neural_operator_reference/benchmarking.py"
+      - "src/neural_operator_reference/darcy.py"
+      - "src/neural_operator_reference/darcy_datasets.py"
+      - "scripts/torch_darcy_fno2d_experiment.py"
+      - "tests/test_torch_fno2d.py"
       - "src/neural_operator_reference/torch_deeponet.py"
       - "tests/test_torch_fno.py"
       - "tests/test_torch_deeponet.py"
@@ -53,5 +62,9 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_pino_experiment.py > torch-pino-benchmark.json
           cat torch-pino-benchmark.json
+      - name: Run Darcy FNO 2D benchmark
+        run: |
+          PYTHONPATH=src python scripts/torch_darcy_fno2d_experiment.py > torch-darcy-fno2d-benchmark.json
+          cat torch-darcy-fno2d-benchmark.json
       - name: Compile Python modules
         run: python -m compileall -q src tests scripts
