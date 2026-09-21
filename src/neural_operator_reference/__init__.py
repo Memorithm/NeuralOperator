@@ -52,6 +52,13 @@ from .evaluation import (
 )
 from .torch_fno1d import TorchFNO1D, TorchFNOFitResult
 from .torch_deeponet import TorchDeepONet1D, TorchDeepONetFitResult
+from .benchmarking import (
+    BurgersOneStepMetrics,
+    InferenceTiming,
+    benchmark_inference,
+    evaluate_burgers_dataset,
+    trainable_parameter_count,
+)
 
 __all__ = [
     "burgers_residual",
@@ -98,4 +105,9 @@ __all__ = [
     "TorchFNOFitResult",
     "TorchDeepONet1D",
     "TorchDeepONetFitResult",
+    "BurgersOneStepMetrics",
+    "InferenceTiming",
+    "benchmark_inference",
+    "evaluate_burgers_dataset",
+    "trainable_parameter_count",
 ]
