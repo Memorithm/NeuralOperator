@@ -59,6 +59,15 @@ from .benchmarking import (
     evaluate_burgers_dataset,
     trainable_parameter_count,
 )
+from .torch_physics import (
+    TorchPhysicsFitResult,
+    fit_torch_fno_burgers_physics,
+    torch_burgers_data_physics_loss,
+    torch_burgers_rhs,
+    torch_burgers_transition_residual,
+    torch_dealiased_product,
+    torch_spectral_derivative,
+)
 
 __all__ = [
     "burgers_residual",
@@ -110,4 +119,11 @@ __all__ = [
     "benchmark_inference",
     "evaluate_burgers_dataset",
     "trainable_parameter_count",
+    "TorchPhysicsFitResult",
+    "fit_torch_fno_burgers_physics",
+    "torch_burgers_data_physics_loss",
+    "torch_burgers_rhs",
+    "torch_burgers_transition_residual",
+    "torch_dealiased_product",
+    "torch_spectral_derivative",
 ]
