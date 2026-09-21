@@ -36,10 +36,14 @@ parameter. The OOD benchmark evaluates fixed families that separately shift
 coefficient contrast, spectral roughness/smoothness and mean permeability,
 with three model/training replicates and shared evaluation cohorts.
 
-The next gate is resolution-aware physics weighting, followed by anisotropic
-coefficients and non-rectangular/boundary-condition shifts. If the conclusions
-remain stable, the program can move to advection-diffusion with the same
-evidence protocol.
+The same Darcy PINO weight sweep is now repeated at 9x9 and 17x17 with paired
+initialization seeds, a fixed architecture and identical weight candidates.
+This measures whether the data/physics trade-off is resolution-sensitive
+instead of assuming one global physics coefficient.
+
+The next gate is anisotropic coefficients and non-rectangular/boundary-condition
+shifts. If the conclusions remain stable, the program can move to
+advection-diffusion with the same evidence protocol.
 
 ---
 ## Previous checkpoint — 20 September 2026
