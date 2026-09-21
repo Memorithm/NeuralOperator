@@ -27,6 +27,13 @@ from .darcy_datasets import (
     generate_darcy_dataset,
     random_log_permeability,
 )
+from .darcy_scaling import (
+    darcy_geometric_mean_scale,
+    normalize_darcy_dataset_scale,
+    normalize_darcy_permeability_scale,
+    normalize_darcy_pressure_scale,
+    restore_darcy_pressure_scale,
+)
 from .datasets import (
     BurgersDataset,
     generate_burgers_dataset,
@@ -115,6 +122,11 @@ __all__ = [
     "DarcyDataset",
     "generate_darcy_dataset",
     "random_log_permeability",
+    "darcy_geometric_mean_scale",
+    "normalize_darcy_dataset_scale",
+    "normalize_darcy_permeability_scale",
+    "normalize_darcy_pressure_scale",
+    "restore_darcy_pressure_scale",
     "BurgersDataset",
     "generate_burgers_dataset",
     "random_periodic_fields",
