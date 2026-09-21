@@ -22,6 +22,7 @@ class DarcyDataset:
     modes: int
     log_std: float
     mean_log_permeability: float
+    spectral_decay: float = 2.0
 
     @property
     def samples(self) -> int:
@@ -55,6 +56,7 @@ def random_log_permeability(
     length_y: float = 1.0,
     log_std: float = 0.5,
     mean_log_permeability: float = 0.0,
+    spectral_decay: float = 2.0,
 ) -> np.ndarray:
     """Generate smooth positive permeability fields with deterministic provenance."""
 
@@ -70,10 +72,13 @@ def random_log_permeability(
     length_y = _positive_length(length_y, "length_y")
     log_std = float(log_std)
     mean_log_permeability = float(mean_log_permeability)
+    spectral_decay = float(spectral_decay)
     if not np.isfinite(log_std) or log_std < 0.0:
         raise ValueError("log_std must be finite and non-negative")
     if not np.isfinite(mean_log_permeability):
         raise ValueError("mean_log_permeability must be finite")
+    if not np.isfinite(spectral_decay) or spectral_decay < 0.0:
+        raise ValueError("spectral_decay must be finite and non-negative")
 
     x = np.linspace(0.0, length_x, points_x)
     y = np.linspace(0.0, length_y, points_y)
@@ -86,7 +91,10 @@ def random_log_permeability(
             if mode_x == 0 and mode_y == 0:
                 continue
             squared_frequency = mode_x * mode_x + mode_y * mode_y
-            scale = 1.0 / float(squared_frequency)
+            if spectral_decay == 2.0:
+                scale = 1.0 / float(squared_frequency)
+            else:
+                scale = float(squared_frequency) ** (-0.5 * spectral_decay)
             phase = 2.0 * np.pi * (
                 mode_x * grid_x / length_x + mode_y * grid_y / length_y
             )
@@ -119,6 +127,7 @@ def generate_darcy_dataset(
     length_y: float = 1.0,
     log_std: float = 0.5,
     mean_log_permeability: float = 0.0,
+    spectral_decay: float = 2.0,
 ) -> DarcyDataset:
     """Generate permeability -> pressure pairs using the reference solver."""
 
@@ -135,6 +144,7 @@ def generate_darcy_dataset(
         length_y=length_y,
         log_std=log_std,
         mean_log_permeability=mean_log_permeability,
+        spectral_decay=spectral_decay,
     )
     solutions = np.stack(
         [
@@ -158,4 +168,5 @@ def generate_darcy_dataset(
         modes=int(modes),
         log_std=float(log_std),
         mean_log_permeability=float(mean_log_permeability),
+        spectral_decay=float(spectral_decay),
     )
