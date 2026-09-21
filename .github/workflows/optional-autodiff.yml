@@ -108,5 +108,12 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_darcy_pino_resolution.py > torch-darcy-pino-resolution.json
           cat torch-darcy-pino-resolution.json
+      - name: Upload benchmark evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: neural-operator-benchmarks
+          path: "*.json"
+          if-no-files-found: error
+          retention-days: 14
       - name: Compile Python modules
         run: python -m compileall -q src tests scripts
