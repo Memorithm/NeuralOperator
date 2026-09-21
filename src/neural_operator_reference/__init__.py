@@ -21,6 +21,12 @@ from .burgers import (
     periodic_energy,
     periodic_mean,
 )
+from .darcy import darcy_residual_2d, solve_darcy_2d
+from .darcy_datasets import (
+    DarcyDataset,
+    generate_darcy_dataset,
+    random_log_permeability,
+)
 from .datasets import (
     BurgersDataset,
     generate_burgers_dataset,
@@ -88,6 +94,11 @@ __all__ = [
     "integrate_burgers",
     "periodic_energy",
     "periodic_mean",
+    "darcy_residual_2d",
+    "solve_darcy_2d",
+    "DarcyDataset",
+    "generate_darcy_dataset",
+    "random_log_permeability",
     "BurgersDataset",
     "generate_burgers_dataset",
     "random_periodic_fields",

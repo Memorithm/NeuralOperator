@@ -14,6 +14,8 @@ machine learning :
 - baseline d'opérateur de Fourier linéaire ajustée par moindres carrés ;
 - FNO 1D minimal entraînable par SciPy pour validation de protocole ;
 - solveur de référence Burgers 1D périodique par RK4 avec anti-aliasing ;
+- solveur Darcy 2D à coefficient variable, stencil conservatif et bords de Dirichlet homogènes ;
+- génération déterministe de champs de perméabilité log-normaux lisses pour Darcy ;
 - génération déterministe de datasets Burgers avec métadonnées ;
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
@@ -44,6 +46,7 @@ PYTHONPATH=src python3 -m unittest discover -s tests -v
 PYTHONPATH=src python3 scripts/reference_experiment.py
 PYTHONPATH=src python3 scripts/fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_benchmark.py
+PYTHONPATH=src python3 scripts/darcy_benchmark.py
 PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
 PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
@@ -60,22 +63,22 @@ aucun accès réseau n'est nécessaire pour ces vérifications.
 
 ## Prochain jalon
 
-Étendre le benchmark d'opérateur 1D périodique basé sur Burgers avec :
+Le socle Burgers dispose désormais des baselines, du backend autodiff PyTorch,
+de la comparaison FNO/DeepONet et d'un PINO de transition différentiable.
+Le deuxième problème de vérité terrain est Darcy 2D : le dépôt contient un
+solveur conservatif à coefficient variable, des jeux déterministes et un
+benchmark de convergence analytique.
 
-1. données générées par le solveur de référence contrôlé ;
-2. baseline interpolation/conv1d ;
-3. FNO entraînable sur données d'EDP ;
-4. pertes données + résidu PDE ;
-5. évaluation multi-résolution et stabilité du rollout.
+La suite technique est maintenant :
 
-Les résultats devront inclure l'erreur relative, le résidu physique, la
-conservation pertinente, le coût d'entraînement amorti et le coût d'inférence.
+1. entraîner un opérateur 2D sur les paires perméabilité -> pression Darcy ;
+2. comparer FNO 2D, baseline locale et DeepONet avec budget contrôlé ;
+3. mesurer le transfert de résolution et l'OOD sur la rugosité et le contraste de perméabilité ;
+4. ajouter advection-diffusion avant Navier-Stokes 2D ;
+5. ne porter vers Rust/SciRust que les noyaux acceptés par les oracles numériques.
 
-L'expérience FNO est volontairement synthétique : elle vérifie le contrat
-spectral et le transfert de résolution sur un opérateur linéaire à modes bas.
-Elle ne constitue pas encore une validation sur une EDP ni une comparaison de
-performance avec PyTorch.
-
+Aucun avantage de performance ou d'invariance de résolution n'est revendiqué
+pour Darcy tant que ces comparaisons n'ont pas été mesurées.
 
 ## Licence
 

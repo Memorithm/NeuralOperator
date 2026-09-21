@@ -1,4 +1,26 @@
-## Current checkpoint — 20 September 2026
+## Current checkpoint — 21 September 2026
+
+This checkpoint supersedes the 20 September snapshot below.
+
+Since that checkpoint, the repository has advanced through the optional PyTorch
+autodiff FNO, NumPy/PyTorch parity checks, a nonlinear PyTorch DeepONet
+reference, a controlled FNO/DeepONet Burgers comparison, and PR #20's
+differentiable spectral transition-PINO training path. The transition PINO
+still uses a finite temporal transition quotient; it is not a continuous-time
+collocation residual.
+
+The current tranche adds the second PDE truth family: a conservative 2D Darcy
+solver for -div(k grad u) = f with strictly positive variable permeability,
+homogeneous Dirichlet boundaries, deterministic permeability datasets,
+discrete-residual checks, and an analytic convergence benchmark.
+
+The next technical gate is a trainable 2D operator on the Darcy
+permeability-to-pressure mapping, followed by controlled FNO/DeepONet/local
+baseline comparison, resolution transfer and OOD coefficient tests. No broad
+performance or resolution-invariance claim is made at this stage.
+
+---
+## Previous checkpoint — 20 September 2026
 
 Since the initial roadmap was written, the following repository changes are merged:
 
@@ -166,6 +188,13 @@ Le solveur Burgers 1D périodique de référence est maintenant implémenté dan
 anti-aliasé et des contrôles de moyenne et d'énergie. La génération de datasets
 déterministe est maintenant disponible dans `datasets.py`, et un premier FNO
 est entraîné sur Burgers dans `scripts/burgers_fno_experiment.py`.
+
+Le deuxième problème de vérité terrain est maintenant initialisé avec Darcy 2D.
+`darcy.py` implémente un stencil de flux conservatif à coefficient variable avec
+moyennes harmoniques aux faces et conditions de Dirichlet homogènes.
+`darcy_datasets.py` produit des champs de perméabilité positifs et déterministes,
+et `scripts/darcy_benchmark.py` mesure convergence analytique et résidu discret.
+Un opérateur neuronal 2D entraînable n'est pas encore inclus dans ce lot.
 
 Ordre recommandé :
 
