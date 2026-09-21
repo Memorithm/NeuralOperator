@@ -11,7 +11,9 @@ on:
       - "src/neural_operator_reference/torch_localconv2d.py"
       - "src/neural_operator_reference/benchmarking.py"
       - "src/neural_operator_reference/torch_physics.py"
+      - "src/neural_operator_reference/torch_darcy_physics.py"
       - "scripts/torch_pino_experiment.py"
+      - "scripts/torch_darcy_pino_experiment.py"
       - "src/neural_operator_reference/evaluation.py"
       - "scripts/torch_operator_comparison.py"
       - "scripts/torch_darcy_fno2d_experiment.py"
@@ -22,6 +24,7 @@ on:
       - "tests/test_torch_deeponet.py"
       - "tests/test_torch_benchmarking.py"
       - "tests/test_torch_physics.py"
+      - "tests/test_torch_darcy_physics.py"
       - "tests/test_evaluation.py"
       - "requirements-autodiff.txt"
       - ".github/workflows/optional-autodiff.yml"
@@ -38,8 +41,11 @@ on:
       - "src/neural_operator_reference/torch_deeponet.py"
       - "src/neural_operator_reference/torch_deeponet2d.py"
       - "src/neural_operator_reference/torch_localconv2d.py"
+      - "src/neural_operator_reference/torch_darcy_physics.py"
       - "scripts/torch_darcy_operator_comparison.py"
+      - "scripts/torch_darcy_pino_experiment.py"
       - "tests/test_torch_darcy_comparison.py"
+      - "tests/test_torch_darcy_physics.py"
       - "tests/test_torch_fno.py"
       - "tests/test_torch_deeponet.py"
       - "requirements-autodiff.txt"
@@ -78,5 +84,9 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_darcy_operator_comparison.py > torch-darcy-operator-comparison.json
           cat torch-darcy-operator-comparison.json
+      - name: Run Darcy physics-weight sweep
+        run: |
+          PYTHONPATH=src python scripts/torch_darcy_pino_experiment.py > torch-darcy-pino-benchmark.json
+          cat torch-darcy-pino-benchmark.json
       - name: Compile Python modules
         run: python -m compileall -q src tests scripts

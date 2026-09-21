@@ -83,6 +83,11 @@ from .torch_physics import (
     torch_dealiased_product,
     torch_spectral_derivative,
 )
+from .torch_darcy_physics import (
+    fit_torch_fno_darcy_physics,
+    torch_darcy_data_physics_loss,
+    torch_darcy_residual_2d,
+)
 
 __all__ = [
     "burgers_residual",
@@ -155,4 +160,7 @@ __all__ = [
     "torch_burgers_transition_residual",
     "torch_dealiased_product",
     "torch_spectral_derivative",
+    "fit_torch_fno_darcy_physics",
+    "torch_darcy_data_physics_loss",
+    "torch_darcy_residual_2d",
 ]

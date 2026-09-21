@@ -18,6 +18,7 @@ machine learning :
 - génération déterministe de champs de perméabilité log-normaux lisses pour Darcy ;
 - FNO 2D PyTorch coordonné, avec mélange spectral complexe et contrainte Dirichlet forte ;
 - DeepONet 2D non linéaire et baseline convolutionnelle locale à budget de paramètres rapproché ;
+- résidu Darcy conservatif différentiable et entraînement FNO data+physique avec sweep du poids PINO ;
 - génération déterministe de datasets Burgers avec métadonnées ;
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
@@ -51,6 +52,7 @@ PYTHONPATH=src python3 scripts/burgers_benchmark.py
 PYTHONPATH=src python3 scripts/darcy_benchmark.py
 PYTHONPATH=src python3 scripts/torch_darcy_fno2d_experiment.py
 PYTHONPATH=src python3 scripts/torch_darcy_operator_comparison.py
+PYTHONPATH=src python3 scripts/torch_darcy_pino_experiment.py
 PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
 PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
@@ -76,9 +78,9 @@ apprend désormais le mapping perméabilité -> pression sur grille rectangulair
 
 La suite technique est maintenant :
 
-1. renforcer les tests OOD sur rugosité, contraste et familles de coefficients ;
-2. ajouter une perte Darcy différentiable et comparer data-only contre PINO elliptique ;
-3. étendre la comparaison contrôlée à plusieurs graines et tailles de jeux ;
+1. étendre les benchmarks Darcy à plusieurs graines et tailles de jeux ;
+2. renforcer les tests OOD sur rugosité, contraste et familles de coefficients ;
+3. calibrer la pondération physique selon résolution et échelle du forcing ;
 4. ajouter advection-diffusion avant Navier-Stokes 2D ;
 5. ne porter vers Rust/SciRust que les noyaux acceptés par les oracles numériques.
 
