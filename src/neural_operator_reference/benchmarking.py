@@ -19,6 +19,44 @@ ArrayOperator = Callable[[np.ndarray], object]
 
 
 @dataclass(frozen=True)
+class ScalarSummary:
+    """Descriptive statistics for repeated scalar measurements."""
+
+    count: int
+    mean: float
+    sample_std: float
+    minimum: float
+    maximum: float
+
+    def as_dict(self) -> dict[str, int | float]:
+        return {
+            "count": self.count,
+            "mean": self.mean,
+            "sample_std": self.sample_std,
+            "minimum": self.minimum,
+            "maximum": self.maximum,
+        }
+
+
+def summarize_scalars(values) -> ScalarSummary:
+    """Return finite scalar mean, sample deviation and range."""
+
+    array = np.asarray(list(values), dtype=float).reshape(-1)
+    if array.size == 0:
+        raise ValueError("values must contain at least one scalar")
+    if not np.all(np.isfinite(array)):
+        raise ValueError("values must contain only finite scalars")
+    sample_std = 0.0 if array.size == 1 else float(np.std(array, ddof=1))
+    return ScalarSummary(
+        count=int(array.size),
+        mean=float(np.mean(array)),
+        sample_std=sample_std,
+        minimum=float(np.min(array)),
+        maximum=float(np.max(array)),
+    )
+
+
+@dataclass(frozen=True)
 class InferenceTiming:
     """Wall-clock timing for repeated operator evaluations."""
 
