@@ -57,12 +57,15 @@ from .evaluation import (
     rollout_burgers_operator,
 )
 from .torch_fno1d import TorchFNO1D, TorchFNOFitResult
+from .torch_fno2d import TorchFNO2D, TorchFNO2DFitResult
 from .torch_deeponet import TorchDeepONet1D, TorchDeepONetFitResult
 from .benchmarking import (
     BurgersOneStepMetrics,
+    Darcy2DMetrics,
     InferenceTiming,
     benchmark_inference,
     evaluate_burgers_dataset,
+    evaluate_darcy_dataset,
     trainable_parameter_count,
 )
 from .torch_physics import (
@@ -123,12 +126,16 @@ __all__ = [
     "rollout_burgers_operator",
     "TorchFNO1D",
     "TorchFNOFitResult",
+    "TorchFNO2D",
+    "TorchFNO2DFitResult",
     "TorchDeepONet1D",
     "TorchDeepONetFitResult",
     "BurgersOneStepMetrics",
+    "Darcy2DMetrics",
     "InferenceTiming",
     "benchmark_inference",
     "evaluate_burgers_dataset",
+    "evaluate_darcy_dataset",
     "trainable_parameter_count",
     "TorchPhysicsFitResult",
     "fit_torch_fno_burgers_physics",

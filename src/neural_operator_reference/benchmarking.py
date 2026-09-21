@@ -8,6 +8,8 @@ from typing import Callable
 
 import numpy as np
 
+from .darcy import darcy_residual_2d
+from .darcy_datasets import DarcyDataset
 from .datasets import BurgersDataset
 from .physics import burgers_transition_physics_loss
 from .spectral import relative_l2_error
@@ -46,6 +48,26 @@ class BurgersOneStepMetrics:
             "mse": self.mse,
             "relative_l2": self.relative_l2,
             "physics_mse": self.physics_mse,
+            "timing": self.timing.as_dict(),
+        }
+
+
+@dataclass(frozen=True)
+class Darcy2DMetrics:
+    """Accuracy, discrete-physics and inference metrics for Darcy fields."""
+
+    mse: float
+    relative_l2: float
+    physics_mse: float
+    boundary_max_abs: float
+    timing: InferenceTiming
+
+    def as_dict(self) -> dict[str, object]:
+        return {
+            "mse": self.mse,
+            "relative_l2": self.relative_l2,
+            "physics_mse": self.physics_mse,
+            "boundary_max_abs": self.boundary_max_abs,
             "timing": self.timing.as_dict(),
         }
 
@@ -98,15 +120,17 @@ def benchmark_inference(
     if not isinstance(repeats, (int, np.integer)) or repeats <= 0:
         raise ValueError("repeats must be a positive integer")
     inputs = np.asarray(inputs, dtype=float)
-    if inputs.ndim != 3 or inputs.shape[-1] != 1:
-        raise ValueError("inputs must have shape (batch, points, 1)")
+    if inputs.ndim < 3 or inputs.shape[-1] != 1:
+        raise ValueError(
+            "inputs must have shape (batch, *spatial_axes, 1)"
+        )
     if not np.all(np.isfinite(inputs)):
         raise ValueError("inputs must contain only finite values")
 
     prediction = _as_numpy_output(operator(inputs))
     if prediction.shape != inputs.shape:
         raise ValueError(
-            "operator must preserve (batch, points, 1) shape; "
+            "operator must preserve the input batch/spatial/channel shape; "
             f"got {prediction.shape} for {inputs.shape}"
         )
 
@@ -115,7 +139,7 @@ def benchmark_inference(
         prediction = _as_numpy_output(operator(inputs))
         if prediction.shape != inputs.shape:
             raise ValueError(
-                "operator must preserve (batch, points, 1) shape during timing"
+                "operator must preserve the input shape during timing"
             )
     total = perf_counter() - start
     timing = InferenceTiming(
@@ -150,5 +174,50 @@ def evaluate_burgers_dataset(
                 forcing=dataset.forcing,
             )
         ),
+        timing=timing,
+    )
+
+
+
+def evaluate_darcy_dataset(
+    operator: ArrayOperator,
+    dataset: DarcyDataset,
+    repeats: int = 20,
+) -> Darcy2DMetrics:
+    """Evaluate Darcy pressure prediction against the sparse truth solver."""
+
+    if not isinstance(dataset, DarcyDataset):
+        raise TypeError("dataset must be a DarcyDataset")
+    prediction, timing = benchmark_inference(
+        operator,
+        dataset.inputs,
+        repeats=repeats,
+    )
+    error = prediction - dataset.targets
+    residual_squares: list[np.ndarray] = []
+    for sample in range(dataset.samples):
+        residual = darcy_residual_2d(
+            prediction[sample, ..., 0],
+            dataset.inputs[sample, ..., 0],
+            forcing=dataset.forcing,
+            length_x=dataset.length_x,
+            length_y=dataset.length_y,
+        )
+        residual_squares.append(residual * residual)
+
+    pressure = prediction[..., 0]
+    boundary_max_abs = max(
+        float(np.max(np.abs(pressure[:, 0, :]))),
+        float(np.max(np.abs(pressure[:, -1, :]))),
+        float(np.max(np.abs(pressure[:, :, 0]))),
+        float(np.max(np.abs(pressure[:, :, -1]))),
+    )
+    return Darcy2DMetrics(
+        mse=float(np.mean(error**2)),
+        relative_l2=float(relative_l2_error(prediction, dataset.targets)),
+        physics_mse=float(
+            np.mean(np.concatenate([values.ravel() for values in residual_squares]))
+        ),
+        boundary_max_abs=boundary_max_abs,
         timing=timing,
     )

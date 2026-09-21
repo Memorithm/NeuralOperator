@@ -16,6 +16,7 @@ machine learning :
 - solveur de référence Burgers 1D périodique par RK4 avec anti-aliasing ;
 - solveur Darcy 2D à coefficient variable, stencil conservatif et bords de Dirichlet homogènes ;
 - génération déterministe de champs de perméabilité log-normaux lisses pour Darcy ;
+- FNO 2D PyTorch coordonné, avec mélange spectral complexe et contrainte Dirichlet forte ;
 - génération déterministe de datasets Burgers avec métadonnées ;
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
@@ -47,6 +48,7 @@ PYTHONPATH=src python3 scripts/reference_experiment.py
 PYTHONPATH=src python3 scripts/fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_benchmark.py
 PYTHONPATH=src python3 scripts/darcy_benchmark.py
+PYTHONPATH=src python3 scripts/torch_darcy_fno2d_experiment.py
 PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
 PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
@@ -67,13 +69,14 @@ Le socle Burgers dispose désormais des baselines, du backend autodiff PyTorch,
 de la comparaison FNO/DeepONet et d'un PINO de transition différentiable.
 Le deuxième problème de vérité terrain est Darcy 2D : le dépôt contient un
 solveur conservatif à coefficient variable, des jeux déterministes et un
-benchmark de convergence analytique.
+benchmark de convergence analytique. Un premier FNO 2D PyTorch entraînable
+apprend désormais le mapping perméabilité -> pression sur grille rectangulaire.
 
 La suite technique est maintenant :
 
-1. entraîner un opérateur 2D sur les paires perméabilité -> pression Darcy ;
-2. comparer FNO 2D, baseline locale et DeepONet avec budget contrôlé ;
-3. mesurer le transfert de résolution et l'OOD sur la rugosité et le contraste de perméabilité ;
+1. comparer FNO 2D, baseline locale et DeepONet 2D avec budget contrôlé ;
+2. renforcer les tests OOD sur rugosité, contraste et familles de coefficients ;
+3. ajouter une perte Darcy différentiable et comparer data-only contre PINO elliptique ;
 4. ajouter advection-diffusion avant Navier-Stokes 2D ;
 5. ne porter vers Rust/SciRust que les noyaux acceptés par les oracles numériques.
 
