@@ -27,9 +27,13 @@ the SciPy truth stencil inside PyTorch autograd, and the FNO training path
 reports data, physics and weighted total losses separately.
 
 The first PINO experiment is a controlled physics-weight sensitivity sweep with
-an explicit zero-weight data-only control. The next gate is multi-seed and
-sample-scaling evidence, resolution-aware physics weighting and broader OOD
-coefficient families before moving to advection-diffusion.
+an explicit zero-weight data-only control. The matched-budget architecture
+comparison is now also repeated over three training-set sizes and three paired
+replicates, with raw runs plus mean/sample-standard-deviation summaries.
+
+The next gate is resolution-aware physics weighting and broader OOD coefficient
+families. If the multi-seed conclusions remain stable under those changes, the
+program can move to advection-diffusion with the same evidence protocol.
 
 ---
 ## Previous checkpoint — 20 September 2026
