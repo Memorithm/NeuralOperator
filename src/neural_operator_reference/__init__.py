@@ -30,6 +30,14 @@ from .darcy_anisotropic_datasets import (
     DarcyDiagonalDataset,
     generate_darcy_diagonal_dataset,
 )
+from .darcy_tensor import (
+    darcy_tensor_residual_2d,
+    solve_darcy_tensor_2d,
+)
+from .darcy_tensor_datasets import (
+    DarcyTensorDataset,
+    generate_darcy_tensor_dataset,
+)
 from .darcy_datasets import (
     DarcyDataset,
     generate_darcy_dataset,
@@ -131,6 +139,10 @@ __all__ = [
     "solve_darcy_diagonal_2d",
     "DarcyDiagonalDataset",
     "generate_darcy_diagonal_dataset",
+    "darcy_tensor_residual_2d",
+    "solve_darcy_tensor_2d",
+    "DarcyTensorDataset",
+    "generate_darcy_tensor_dataset",
     "DarcyDataset",
     "generate_darcy_dataset",
     "random_log_permeability",
