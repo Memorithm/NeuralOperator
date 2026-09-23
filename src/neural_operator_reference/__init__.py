@@ -22,6 +22,14 @@ from .burgers import (
     periodic_mean,
 )
 from .darcy import darcy_residual_2d, solve_darcy_2d
+from .darcy_anisotropic import (
+    darcy_diagonal_residual_2d,
+    solve_darcy_diagonal_2d,
+)
+from .darcy_anisotropic_datasets import (
+    DarcyDiagonalDataset,
+    generate_darcy_diagonal_dataset,
+)
 from .darcy_datasets import (
     DarcyDataset,
     generate_darcy_dataset,
@@ -119,6 +127,10 @@ __all__ = [
     "periodic_mean",
     "darcy_residual_2d",
     "solve_darcy_2d",
+    "darcy_diagonal_residual_2d",
+    "solve_darcy_diagonal_2d",
+    "DarcyDiagonalDataset",
+    "generate_darcy_diagonal_dataset",
     "DarcyDataset",
     "generate_darcy_dataset",
     "random_log_permeability",
