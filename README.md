@@ -24,6 +24,8 @@ machine learning :
 - étude de sensibilité du poids PINO Darcy entre grilles 9×9 et 17×17 ;
 - normalisation exacte de l'échelle globale de perméabilité pour imposer la covariance Darcy k→c·k, u→u/c ;
 - solveur Darcy anisotrope diagonal conservatif, dataset tensoriel déterministe et benchmark de convergence/résidu ;
+- solveur Darcy à tenseur SPD complet par éléments finis Q1, avec terme croisé et orientation spatialement variable ;
+- comparaison tensorielle FNO 2D / DeepONet 2D / convolution locale et réplication multi-seed à cohortes fixes ;
 - génération déterministe de datasets Burgers avec métadonnées ;
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
@@ -63,6 +65,9 @@ PYTHONPATH=src python3 scripts/torch_darcy_ood_families.py
 PYTHONPATH=src python3 scripts/torch_darcy_pino_resolution.py
 PYTHONPATH=src python3 scripts/torch_darcy_scale_equivariance.py
 PYTHONPATH=src python3 scripts/darcy_anisotropic_benchmark.py
+PYTHONPATH=src python3 scripts/darcy_tensor_benchmark.py
+PYTHONPATH=src python3 scripts/torch_darcy_tensor_operator_comparison.py
+PYTHONPATH=src python3 scripts/torch_darcy_tensor_multiseed.py
 PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
 PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
@@ -86,15 +91,16 @@ solveur conservatif à coefficient variable, des jeux déterministes et un
 benchmark de convergence analytique. Un premier FNO 2D PyTorch entraînable
 apprend désormais le mapping perméabilité -> pression sur grille rectangulaire.
 
-La comparaison tensorielle trois canaux est maintenant instrumentée et a été
-reproduite sur Thor. Le premier protocole à un seul seed montre des écarts
-importants entre IID, changement d'orientation et changement du ratio principal,
-mais il est insuffisant pour établir une conclusion d'architecture.
+La comparaison tensorielle trois canaux est maintenant répliquée sur trois
+seeds appariés avec cohortes d'évaluation fixes. Le déplacement du ratio
+principal de 4 à 16 dégrade les trois architectures, tandis que le changement
+d'orientation affecte beaucoup plus FNO et la convolution locale que DeepONet
+dans ce protocole. Ces observations restent limitées à cette expérience 9×9.
 
 La suite technique est maintenant :
 
-1. répliquer la comparaison tensorielle sur plusieurs seeds avec cohortes d'évaluation fixes et statistiques de dispersion ;
-2. tester ensuite normalisation/équivariance tensorielle seulement si les écarts multi-seed persistent ;
+1. tester une normalisation tensorielle fondée d'abord sur la covariance Darcy exacte sous changement d'échelle global ;
+2. tester séparément une représentation SPD rotation-aware contre le baseline brut trois canaux ;
 3. étendre l'oracle aux géométries non rectangulaires et aux conditions aux limites mixtes/Neumann ;
 4. tester des champs à discontinuités/facies puis advection-diffusion ;
 5. ne porter vers Rust/SciRust que les noyaux acceptés par les oracles numériques.
