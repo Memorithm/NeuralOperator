@@ -1,4 +1,49 @@
-## Current checkpoint — 23 September 2026 (tensor learned baseline)
+## Current checkpoint — 23 September 2026 (tensor multi-seed replication)
+
+The full-SPD learned comparison has now been repeated over three paired
+replicates. Each replicate changes both the training draw and model
+initialization, while the three architectures share that training draw and all
+evaluation cohorts remain fixed. The replicate seeds are 2, 4 and 6; fixed
+evaluation cohorts contain eight IID, eight orientation-OOD and eight
+principal-ratio-OOD samples.
+
+The qualified code commit is
+`66af393a8735d23f8c57daec6ad1b592e5eef09f`. GitHub standard tests passed
+in run 35819768370. Memorithm/RemoteOps run 35819805973 reproduced the study on
+NVIDIA Thor with NumPy 2.5.3, SciPy 1.18.1 and PyTorch 2.14.0+cu130, CUDA
+enabled, and 6/6 prerequisite tensor/PyTorch tests passing. The resulting JSON
+has SHA-256
+`51628b65fba2dc9f7b76a5fa6528784a1df6ca7a6fd97ccfad76c467d63d2fe6`.
+
+Mean ± sample-standard-deviation relative L2 errors are:
+
+- FNO 2D: IID 0.14116 ± 0.00244, orientation OOD 0.54257 ± 0.14927,
+  principal-ratio-16 OOD 0.64622 ± 0.08158.
+- DeepONet 2D: IID 0.20319 ± 0.00986, orientation OOD 0.22774 ± 0.00821,
+  principal-ratio-16 OOD 0.75631 ± 0.01609.
+- local convolution 2D: IID 0.22406 ± 0.03969, orientation OOD
+  0.71692 ± 0.24411, principal-ratio-16 OOD 1.10353 ± 0.25853.
+
+The paired within-replicate orientation-OOD/IID relative-L2 ratio is
+3.851 ± 1.106 for FNO, 1.121 ± 0.024 for DeepONet and 3.130 ± 0.595 for the
+local convolution baseline. The corresponding principal-ratio-16 ratios are
+4.573 ± 0.508, 3.726 ± 0.131 and 4.941 ± 0.814 respectively.
+
+This establishes that the ratio-16 shift is a shared failure mode in this
+protocol, while the orientation shift affects the three references very
+differently. It still does not establish a universal architecture ranking:
+three replicates, one 9x9 resolution and smooth tensor fields are exploratory.
+
+The next controlled gate is tensor-aware representation/normalization. The first
+candidate should preserve the exact Darcy covariance under global tensor
+scaling, followed by a separate rotation-aware SPD representation experiment.
+Both must retain the same paired seeds and fixed evaluation cohorts. Geometry,
+mixed/Neumann boundaries and discontinuous facies remain subsequent truth-oracle
+gates.
+
+---
+
+## Previous checkpoint — 23 September 2026 (tensor learned baseline)
 
 The full-SPD truth oracle is now connected to the three existing 2D learned
 operator references without architecture-specific tensor preprocessing. FNO 2D,
