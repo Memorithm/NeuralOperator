@@ -1,4 +1,49 @@
-## Current checkpoint — 21 September 2026
+## Current checkpoint — 23 September 2026
+
+This checkpoint supersedes the 21 September snapshot below.
+
+The diagonal-anisotropic Darcy truth path is now implemented and qualified.
+The conservative stencil solves
+
+`-d_x(k_x d_x u) - d_y(k_y d_y u) = f`
+
+with strictly positive diagonal coefficients, harmonic face means and
+homogeneous Dirichlet boundaries. The deterministic dataset represents the
+tensor field with two input channels and constructs a controlled family with
+`k_x/k_y = r` while preserving the scalar geometric scale
+`sqrt(k_x k_y)`.
+
+The qualification includes exact reduction to the scalar Darcy solver when
+`k_x = k_y`, deterministic dataset reproduction, invalid-input guards,
+second-order analytic convergence and a versioned JSON benchmark. On the
+self-hosted ARM64 qualification run, all five anisotropic tests passed. The
+isotropic-reduction maximum solution difference was exactly `0.0`. The
+relative L2 errors at 9, 17, 33 and 65 points were respectively
+`1.2950746721879309e-2`, `3.218964440080193e-3`,
+`8.035776793720459e-4` and `2.0082180969406666e-4`, with observed orders
+`2.0084`, `2.0021` and `2.0005`.
+
+For controlled anisotropy ratios `0.25`, `1`, `4` and `16`, the
+pointwise ratio error was exactly zero and the largest measured absolute
+discrete residual was `4.218847493575595e-14`. These are truth-solver
+properties only: no learned-operator advantage is claimed by this tranche.
+
+The global permeability-scale equivariance tranche was separately qualified on
+the same ARM64 control plane with the optional PyTorch backend: all 26
+`test_torch_*.py` tests passed under Python 3.12.3, NumPy 2.5.3,
+SciPy 1.18.1 and PyTorch 2.14.0+cu130 with CUDA available. For the FNO2D
+benchmark, the mean relative L2 error on the `mean_high_extreme` family was
+`2.03551979245677` in raw mode and `0.10035770485973827` with exact scale
+equivariance; IID behavior was unchanged to floating-point precision.
+
+The next gate is no longer basic diagonal anisotropy. It is rotated/spatially
+varying anisotropy, non-rectangular geometry and boundary-condition shifts,
+then discontinuous facies. Learned FNO/DeepONet/local-convolution comparisons
+must follow the truth-solver extension instead of preceding it.
+
+---
+
+## Previous checkpoint — 21 September 2026
 
 This checkpoint supersedes the 20 September snapshot below.
 

@@ -22,7 +22,7 @@ machine learning :
 - étude multi-seed et sample-scaling pour FNO 2D, DeepONet 2D et convolution locale ;
 - familles OOD Darcy contrôlées par contraste, rugosité spectrale et échelle moyenne de perméabilité ;
 - étude de sensibilité du poids PINO Darcy entre grilles 9×9 et 17×17 ;
-- normalisation exacte de l'échelle globale de perméabilité pour imposer la covariance Darcy k→c·k, u→u/c ;
+- normalisation exacte de l'échelle globale de perméabilité pour imposer la covariance Darcy k→c·k, u→u/c ;\n- solveur Darcy anisotrope diagonal conservatif, dataset tensoriel déterministe et benchmark de convergence/résidu ;
 - génération déterministe de datasets Burgers avec métadonnées ;
 - diagnostic séparé de perte de données et de résidu PDE Burgers ;
 - baseline d'interpolation linéaire périodique pour le transfert de résolution ;
@@ -60,7 +60,7 @@ PYTHONPATH=src python3 scripts/torch_darcy_pino_experiment.py
 PYTHONPATH=src python3 scripts/torch_darcy_multiseed_scaling.py
 PYTHONPATH=src python3 scripts/torch_darcy_ood_families.py
 PYTHONPATH=src python3 scripts/torch_darcy_pino_resolution.py
-PYTHONPATH=src python3 scripts/torch_darcy_scale_equivariance.py
+PYTHONPATH=src python3 scripts/torch_darcy_scale_equivariance.py\nPYTHONPATH=src python3 scripts/darcy_anisotropic_benchmark.py
 PYTHONPATH=src python3 scripts/burgers_dataset_experiment.py
 PYTHONPATH=src python3 scripts/burgers_fno_experiment.py
 PYTHONPATH=src python3 scripts/burgers_pino_experiment.py
