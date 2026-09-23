@@ -56,8 +56,21 @@ The later metric correction only changes behavior for predictions that violate
 the Dirichlet boundary: boundary error is measured on the raw prediction and
 the interior PDE residual is evaluated after projecting the prescribed zero
 boundary. These three benchmark models already impose a zero boundary exactly,
-so that correction does not change the values below. The corrected evaluator is
-separately covered by general tests.
+so that correction does not change the values below.
+
+The corrected evaluator was qualified independently on the Thor control plane:
+
+- corrected code commit: `ef219ad3bf20309b03e3010ccbc0035d58d800e2`;
+- RemoteOps run: https://github.com/Memorithm/RemoteOps/actions/runs/35819149284;
+- runner backend: NumPy 2.5.3, SciPy 1.18.1, PyTorch 2.14.0+cu130;
+- CUDA: available on NVIDIA Thor;
+- targeted tests: 6/6 passed;
+- benchmark SHA-256:
+  `2de99a4bd64e922227616d1ad6b92336031b1bb9db75f68130306ac0e2f1371e`.
+
+The Thor execution reproduced the relative-L2 and Q1-residual values below to
+floating-point precision. Training wall times differ between runners and are
+therefore treated only as environment-specific measurements.
 
 ### Relative L2 error
 
