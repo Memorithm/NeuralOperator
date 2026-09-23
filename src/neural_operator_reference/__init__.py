@@ -96,6 +96,7 @@ from .benchmarking import (
     benchmark_inference,
     evaluate_burgers_dataset,
     evaluate_darcy_dataset,
+    evaluate_darcy_tensor_dataset,
     summarize_scalars,
     trainable_parameter_count,
 )
@@ -191,6 +192,7 @@ __all__ = [
     "benchmark_inference",
     "evaluate_burgers_dataset",
     "evaluate_darcy_dataset",
+    "evaluate_darcy_tensor_dataset",
     "summarize_scalars",
     "trainable_parameter_count",
     "TorchPhysicsFitResult",

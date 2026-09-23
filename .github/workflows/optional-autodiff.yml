@@ -10,6 +10,8 @@ on:
       - "src/neural_operator_reference/torch_deeponet2d.py"
       - "src/neural_operator_reference/torch_localconv2d.py"
       - "src/neural_operator_reference/benchmarking.py"
+      - "src/neural_operator_reference/darcy_tensor.py"
+      - "src/neural_operator_reference/darcy_tensor_datasets.py"
       - "src/neural_operator_reference/torch_physics.py"
       - "src/neural_operator_reference/torch_darcy_physics.py"
       - "scripts/torch_pino_experiment.py"
@@ -22,9 +24,12 @@ on:
       - "scripts/torch_operator_comparison.py"
       - "scripts/torch_darcy_fno2d_experiment.py"
       - "scripts/torch_darcy_operator_comparison.py"
+      - "scripts/torch_darcy_tensor_operator_comparison.py"
       - "tests/test_torch_fno.py"
       - "tests/test_torch_fno2d.py"
       - "tests/test_torch_darcy_comparison.py"
+      - "tests/test_torch_darcy_tensor_comparison.py"
+      - "tests/test_darcy_tensor_benchmarking.py"
       - "tests/test_torch_deeponet.py"
       - "tests/test_torch_benchmarking.py"
       - "tests/test_torch_physics.py"
@@ -96,6 +101,10 @@ jobs:
         run: |
           PYTHONPATH=src python scripts/torch_darcy_operator_comparison.py > torch-darcy-operator-comparison.json
           cat torch-darcy-operator-comparison.json
+      - name: Run matched-budget full tensor Darcy operator comparison
+        run: |
+          PYTHONPATH=src python scripts/torch_darcy_tensor_operator_comparison.py > torch-darcy-tensor-operator-comparison.json
+          cat torch-darcy-tensor-operator-comparison.json
       - name: Run Darcy physics-weight sweep
         run: |
           PYTHONPATH=src python scripts/torch_darcy_pino_experiment.py > torch-darcy-pino-benchmark.json

@@ -10,6 +10,8 @@ import numpy as np
 
 from .darcy import darcy_residual_2d
 from .darcy_datasets import DarcyDataset
+from .darcy_tensor import darcy_tensor_residual_2d
+from .darcy_tensor_datasets import DarcyTensorDataset
 from .datasets import BurgersDataset
 from .physics import burgers_transition_physics_loss
 from .spectral import relative_l2_error
@@ -250,6 +252,94 @@ def evaluate_darcy_dataset(
         float(np.max(np.abs(pressure[:, :, 0]))),
         float(np.max(np.abs(pressure[:, :, -1]))),
     )
+    return Darcy2DMetrics(
+        mse=float(np.mean(error**2)),
+        relative_l2=float(relative_l2_error(prediction, dataset.targets)),
+        physics_mse=float(
+            np.mean(np.concatenate([values.ravel() for values in residual_squares]))
+        ),
+        boundary_max_abs=boundary_max_abs,
+        timing=timing,
+    )
+
+
+def evaluate_darcy_tensor_dataset(
+    operator: ArrayOperator,
+    dataset: DarcyTensorDataset,
+    repeats: int = 20,
+) -> Darcy2DMetrics:
+    """Evaluate full-SPD Darcy pressure prediction with the tensor FE residual.
+
+    The input contract is (batch, points_y, points_x, 3) for K_xx, K_xy and
+    K_yy, while the operator output contract is (batch, points_y, points_x, 1).
+    Physics MSE is the mean squared algebraic residual of the Q1 reference
+    system after imposing the prescribed zero boundary. Boundary violation is
+    reported separately and is not silently discarded.
+    """
+
+    if not isinstance(dataset, DarcyTensorDataset):
+        raise TypeError("dataset must be a DarcyTensorDataset")
+    if not callable(operator):
+        raise TypeError("operator must be callable")
+    if not isinstance(repeats, (int, np.integer)) or int(repeats) <= 0:
+        raise ValueError("repeats must be a positive integer")
+
+    inputs = np.asarray(dataset.inputs, dtype=float)
+    expected_shape = (
+        dataset.samples,
+        dataset.grid_shape[0],
+        dataset.grid_shape[1],
+        1,
+    )
+
+    prediction = _as_numpy_output(operator(inputs))
+    if prediction.shape != expected_shape:
+        raise ValueError(
+            "tensor Darcy operator must return shape "
+            f"{expected_shape}; got {prediction.shape}"
+        )
+
+    start = perf_counter()
+    for _ in range(int(repeats)):
+        prediction = _as_numpy_output(operator(inputs))
+        if prediction.shape != expected_shape:
+            raise ValueError(
+                "tensor Darcy operator output shape changed during timing"
+            )
+    total = perf_counter() - start
+    timing = InferenceTiming(
+        repeats=int(repeats),
+        total_seconds=float(total),
+        seconds_per_call=float(total / int(repeats)),
+    )
+
+    error = prediction - dataset.targets
+    pressure = prediction[..., 0]
+    boundary_max_abs = max(
+        float(np.max(np.abs(pressure[:, 0, :]))),
+        float(np.max(np.abs(pressure[:, -1, :]))),
+        float(np.max(np.abs(pressure[:, :, 0]))),
+        float(np.max(np.abs(pressure[:, :, -1]))),
+    )
+
+    residual_pressure = pressure.copy()
+    residual_pressure[:, 0, :] = 0.0
+    residual_pressure[:, -1, :] = 0.0
+    residual_pressure[:, :, 0] = 0.0
+    residual_pressure[:, :, -1] = 0.0
+    residual_squares: list[np.ndarray] = []
+    for sample in range(dataset.samples):
+        residual = darcy_tensor_residual_2d(
+            residual_pressure[sample],
+            dataset.inputs[sample, ..., 0],
+            dataset.inputs[sample, ..., 1],
+            dataset.inputs[sample, ..., 2],
+            forcing=dataset.forcing,
+            length_x=dataset.length_x,
+            length_y=dataset.length_y,
+        )
+        residual_squares.append(residual * residual)
+
     return Darcy2DMetrics(
         mse=float(np.mean(error**2)),
         relative_l2=float(relative_l2_error(prediction, dataset.targets)),

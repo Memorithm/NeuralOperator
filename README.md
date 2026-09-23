@@ -84,16 +84,21 @@ solveur conservatif à coefficient variable, des jeux déterministes et un
 benchmark de convergence analytique. Un premier FNO 2D PyTorch entraînable
 apprend désormais le mapping perméabilité -> pression sur grille rectangulaire.
 
+La comparaison tensorielle trois canaux est maintenant instrumentée et a été
+reproduite sur Thor. Le premier protocole à un seul seed montre des écarts
+importants entre IID, changement d'orientation et changement du ratio principal,
+mais il est insuffisant pour établir une conclusion d'architecture.
+
 La suite technique est maintenant :
 
-1. comparer FNO 2D, DeepONet 2D et convolution locale sur les trois canaux du tenseur SPD avec familles tournées/OOD contrôlées ;
-2. étendre l'oracle aux géométries non rectangulaires et aux conditions aux limites mixtes/Neumann ;
-3. tester des champs à discontinuités/facies ;
-4. ajouter advection-diffusion avec le même protocole de preuve avant Navier-Stokes 2D ;
+1. répliquer la comparaison tensorielle sur plusieurs seeds avec cohortes d'évaluation fixes et statistiques de dispersion ;
+2. tester ensuite normalisation/équivariance tensorielle seulement si les écarts multi-seed persistent ;
+3. étendre l'oracle aux géométries non rectangulaires et aux conditions aux limites mixtes/Neumann ;
+4. tester des champs à discontinuités/facies puis advection-diffusion ;
 5. ne porter vers Rust/SciRust que les noyaux acceptés par les oracles numériques.
 
-Aucun avantage de performance ou d'invariance de résolution n'est revendiqué
-pour Darcy tant que ces comparaisons n'ont pas été mesurées.
+Aucun avantage universel d'architecture, de performance ou d'invariance de
+résolution n'est revendiqué à partir du seul benchmark tensoriel actuel.
 
 ## Licence
 
