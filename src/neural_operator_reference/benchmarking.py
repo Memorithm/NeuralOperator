@@ -252,30 +252,6 @@ def evaluate_darcy_dataset(
         float(np.max(np.abs(pressure[:, :, 0]))),
         float(np.max(np.abs(pressure[:, :, -1]))),
     )
-
-    # The truth operator imposes homogeneous Dirichlet data strongly. Measure
-    # boundary violation separately, then evaluate the interior PDE residual
-    # after projecting only the boundary to the prescribed value. This avoids
-    # hiding a boundary error while still making the physics metric available
-    # to models that do not enforce the boundary analytically.
-    residual_pressure = pressure.copy()
-    residual_pressure[:, 0, :] = 0.0
-    residual_pressure[:, -1, :] = 0.0
-    residual_pressure[:, :, 0] = 0.0
-    residual_pressure[:, :, -1] = 0.0
-    residual_squares: list[np.ndarray] = []
-    for sample in range(dataset.samples):
-        residual = darcy_tensor_residual_2d(
-            residual_pressure[sample],
-            dataset.inputs[sample, ..., 0],
-            dataset.inputs[sample, ..., 1],
-            dataset.inputs[sample, ..., 2],
-            forcing=dataset.forcing,
-            length_x=dataset.length_x,
-            length_y=dataset.length_y,
-        )
-        residual_squares.append(residual * residual)
-
     return Darcy2DMetrics(
         mse=float(np.mean(error**2)),
         relative_l2=float(relative_l2_error(prediction, dataset.targets)),
@@ -285,7 +261,6 @@ def evaluate_darcy_dataset(
         boundary_max_abs=boundary_max_abs,
         timing=timing,
     )
-
 
 
 def evaluate_darcy_tensor_dataset(
@@ -298,7 +273,8 @@ def evaluate_darcy_tensor_dataset(
     The input contract is (batch, points_y, points_x, 3) for K_xx, K_xy and
     K_yy, while the operator output contract is (batch, points_y, points_x, 1).
     Physics MSE is the mean squared algebraic residual of the Q1 reference
-    system, so it should only be compared within this tensor discretization.
+    system after imposing the prescribed zero boundary. Boundary violation is
+    reported separately and is not silently discarded.
     """
 
     if not isinstance(dataset, DarcyTensorDataset):
@@ -345,6 +321,25 @@ def evaluate_darcy_tensor_dataset(
         float(np.max(np.abs(pressure[:, :, 0]))),
         float(np.max(np.abs(pressure[:, :, -1]))),
     )
+
+    residual_pressure = pressure.copy()
+    residual_pressure[:, 0, :] = 0.0
+    residual_pressure[:, -1, :] = 0.0
+    residual_pressure[:, :, 0] = 0.0
+    residual_pressure[:, :, -1] = 0.0
+    residual_squares: list[np.ndarray] = []
+    for sample in range(dataset.samples):
+        residual = darcy_tensor_residual_2d(
+            residual_pressure[sample],
+            dataset.inputs[sample, ..., 0],
+            dataset.inputs[sample, ..., 1],
+            dataset.inputs[sample, ..., 2],
+            forcing=dataset.forcing,
+            length_x=dataset.length_x,
+            length_y=dataset.length_y,
+        )
+        residual_squares.append(residual * residual)
+
     return Darcy2DMetrics(
         mse=float(np.mean(error**2)),
         relative_l2=float(relative_l2_error(prediction, dataset.targets)),
