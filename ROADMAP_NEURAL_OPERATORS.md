@@ -1,4 +1,41 @@
-## Current checkpoint — 23 September 2026
+## Current checkpoint — 23 September 2026 (tensor learned baseline)
+
+The full-SPD truth oracle is now connected to the three existing 2D learned
+operator references without architecture-specific tensor preprocessing. FNO 2D,
+DeepONet 2D and the local convolution baseline consume the three physical input
+channels `K_xx`, `K_xy`, and `K_yy`. A dedicated evaluator reports data
+error, relative L2 error, exact boundary violation and the Q1 algebraic residual
+MSE.
+
+Parameter budgets are matched within 3%: 8,379 parameters for DeepONet, 8,465
+for FNO and 8,625 for the local convolution baseline. The first deterministic
+protocol trains on ratio-4 SPD tensors and evaluates independent IID samples,
+an orientation-family shift and a principal-ratio shift to 16.
+
+The corrected implementation at
+`ef219ad3bf20309b03e3010ccbc0035d58d800e2` passed the standard suite
+(85 tests, with optional PyTorch tests skipped there) and was independently
+qualified through Memorithm/RemoteOps run 35819149284 on NVIDIA Thor. The
+targeted PyTorch/tensor suite passed 6/6 tests under NumPy 2.5.3, SciPy 1.18.1
+and PyTorch 2.14.0+cu130 with CUDA enabled. The tensor learned benchmark artifact
+has SHA-256
+`2de99a4bd64e922227616d1ad6b92336031b1bb9db75f68130306ac0e2f1371e`.
+
+For this single-seed protocol, FNO relative L2 is 0.1640 IID, 0.6498 under the
+orientation shift and 0.7307 at principal ratio 16. DeepONet is 0.2353, 0.2265
+and 0.9465 respectively. The local convolution baseline is 0.2384, 1.4753 and
+1.1339. These are descriptive measurements of one controlled run, not an
+architecture ranking or a universal performance claim.
+
+The next evidence gate is multi-seed replication with fixed evaluation cohorts
+and mean/sample-standard-deviation/min/max summaries. Tensor-specific
+normalization or equivariance changes should be evaluated only after that
+replication, followed by non-rectangular geometry, mixed/Neumann boundaries and
+discontinuous facies.
+
+---
+
+## Previous checkpoint — 23 September 2026 (full-SPD truth oracle)
 
 The full-SPD Darcy truth path is now implemented and qualified on Thor through
 Memorithm/RemoteOps. The reference solves `-div(K grad(u))=f` for nodal
