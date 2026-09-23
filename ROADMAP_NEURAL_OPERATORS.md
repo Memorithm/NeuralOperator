@@ -1,5 +1,39 @@
 ## Current checkpoint — 23 September 2026
 
+The full-SPD Darcy truth path is now implemented and qualified on Thor through
+Memorithm/RemoteOps. The reference solves `-div(K grad(u))=f` for nodal
+symmetric positive-definite 2x2 tensor fields with Q1 finite elements and 2x2
+Gauss quadrature. This removes the previous grid-aligned restriction:
+`K_xy` may be non-zero and the principal-axis orientation may vary spatially.
+
+The deterministic dataset stores three channels (`K_xx`, `K_xy`, `K_yy`).
+It preserves a controlled principal-value ratio while the existing scalar
+log-permeability field controls determinant scale and a separate seeded smooth
+field controls orientation.
+
+RemoteOps run 35818381772 qualified commit
+`7c918dcde8e43f90130f25221c3ecf2f476cf135` on
+`thor-remoteops-arm64-01`: all five tensor tests passed. For the constant
+rotated tensor [[2, 0.6], [0.6, 1]], relative L2 error decreased from
+`1.3094e-2` at 9x9 to `2.0670e-4` at 65x65 with observed orders
+`1.9888`, `1.9972`, and `1.9993`. The largest reported algebraic residual
+was `3.083e-15`.
+
+Spatially oriented families with principal ratios 4 and 16 produced non-zero
+cross terms while preserving the eigenvalue ratio to approximately
+`3.11e-15` and `4.62e-14` maximum absolute error respectively. The largest
+algebraic residual across those generated families was below `1.5e-16`.
+
+This tranche establishes truth-solver correctness, not learned-operator
+superiority. The next gate is now a matched-budget three-channel learned
+comparison on rotated/spatial tensor OOD families, followed by
+non-rectangular geometry, mixed/Neumann boundary conditions and discontinuous
+facies.
+
+---
+
+## Previous checkpoint — 23 September 2026 (diagonal anisotropy)
+
 This checkpoint supersedes the 21 September snapshot below.
 
 The diagonal-anisotropic Darcy truth path is now implemented and qualified.
