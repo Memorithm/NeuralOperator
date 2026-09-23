@@ -52,6 +52,25 @@ class DarcyTensorBenchmarkingTests(unittest.TestCase):
                 repeats=1,
             )
 
+    def test_tensor_evaluator_records_boundary_violation_without_failing(self):
+        dataset = generate_darcy_tensor_dataset(
+            samples=1,
+            points_x=7,
+            modes=2,
+            seed=34,
+            anisotropy_ratio=4.0,
+        )
+        prediction = dataset.targets.copy()
+        prediction[:, 0, :, 0] = 0.125
+        metrics = evaluate_darcy_tensor_dataset(
+            lambda inputs: prediction,
+            dataset,
+            repeats=1,
+        )
+        self.assertEqual(metrics.boundary_max_abs, 0.125)
+        self.assertGreater(metrics.mse, 0.0)
+        self.assertTrue(np.isfinite(metrics.physics_mse))
+
     def test_tensor_evaluator_rejects_invalid_repeats(self):
         dataset = generate_darcy_tensor_dataset(
             samples=1,
