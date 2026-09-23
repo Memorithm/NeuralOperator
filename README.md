@@ -86,10 +86,10 @@ apprend désormais le mapping perméabilité -> pression sur grille rectangulair
 
 La suite technique est maintenant :
 
-1. étendre les familles OOD à l'anisotropie et aux géométries non rectangulaires ;
-2. tester des champs à discontinuités/facies et des conditions aux limites mixtes ;
-3. ajouter advection-diffusion avec le même protocole de preuve ;
-4. ajouter advection-diffusion avant Navier-Stokes 2D ;
+1. comparer FNO 2D, DeepONet 2D et convolution locale sur les trois canaux du tenseur SPD avec familles tournées/OOD contrôlées ;
+2. étendre l'oracle aux géométries non rectangulaires et aux conditions aux limites mixtes/Neumann ;
+3. tester des champs à discontinuités/facies ;
+4. ajouter advection-diffusion avec le même protocole de preuve avant Navier-Stokes 2D ;
 5. ne porter vers Rust/SciRust que les noyaux acceptés par les oracles numériques.
 
 Aucun avantage de performance ou d'invariance de résolution n'est revendiqué
