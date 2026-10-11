@@ -1,6 +1,7 @@
 import sys
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 
@@ -60,6 +61,27 @@ class BurgersDatasetSplitTests(unittest.TestCase):
         self.assertEqual(first.ood.modes, 6)
         self.assertEqual(first.ood.amplitude, 0.35)
         self.assertEqual(first.train.horizon, 4.0e-4)
+
+
+    def test_split_rejects_identical_partition_specs(self):
+        train, _, ood = self._specs()
+        with self.assertRaisesRegex(ValueError, "distinct seed domains"):
+            generate_burgers_split(train, train, ood)
+
+    def test_split_rejects_reused_seed_even_when_statistics_differ(self):
+        train, validation, ood = self._specs()
+        validation = BurgersDatasetSpec(
+            **{**validation.as_dict(), "seed": train.seed}
+        )
+        with self.assertRaisesRegex(ValueError, "distinct seed domains"):
+            generate_burgers_split(train, validation, ood)
+
+    def test_split_rejects_generated_input_collisions(self):
+        train, validation, ood = self._specs()
+        repeated = train.build()
+        with patch.object(BurgersDatasetSpec, "build", return_value=repeated):
+            with self.assertRaisesRegex(ValueError, "overlaps"):
+                generate_burgers_split(train, validation, ood)
 
     def test_split_rejects_a_different_prediction_grid(self):
         train, validation, ood = self._specs()
