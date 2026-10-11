@@ -53,6 +53,7 @@ class InferenceTimingContractTests(unittest.TestCase):
         self.assertIn("platform", timing.context)
         self.assertIn("machine", timing.context)
         self.assertIn("threading_environment", timing.context)
+        self.assertIn("backend_threading", timing.context)
         self.assertTrue(
             any("not kernel-only" in item for item in timing.context["limitations"])
         )
