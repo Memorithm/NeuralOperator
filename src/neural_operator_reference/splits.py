@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+import hashlib
 
 import numpy as np
 
@@ -86,6 +87,38 @@ class BurgersDatasetSplit:
         }
 
 
+def _sample_identity(sample: np.ndarray) -> str:
+    """Return a canonical identity for one generated initial condition."""
+
+    canonical = np.ascontiguousarray(sample)
+    digest = hashlib.sha256()
+    digest.update(canonical.dtype.str.encode("ascii"))
+    digest.update(b"\0")
+    digest.update(",".join(str(value) for value in canonical.shape).encode("ascii"))
+    digest.update(b"\0")
+    digest.update(canonical.tobytes(order="C"))
+    return digest.hexdigest()
+
+
+def _assert_disjoint_inputs(partitions: dict[str, BurgersDataset]) -> None:
+    """Reject any initial condition shared by two experiment partitions."""
+
+    owners: dict[str, str] = {}
+    for name, dataset in partitions.items():
+        local: set[str] = set()
+        for sample in dataset.inputs:
+            identity = _sample_identity(sample)
+            if identity in local:
+                raise ValueError(f"{name} contains a duplicate input sample")
+            local.add(identity)
+            previous = owners.get(identity)
+            if previous is not None:
+                raise ValueError(
+                    f"{name} overlaps {previous}: generated input sample {identity}"
+                )
+            owners[identity] = name
+
+
 def generate_burgers_split(
     train: BurgersDatasetSpec,
     validation: BurgersDatasetSpec,
@@ -95,8 +128,9 @@ def generate_burgers_split(
 
     The spatial grid and transition duration must be shared across partitions.
     Initial-condition statistics, viscosity and forcing may differ by design.
-    This prevents an OOD result from silently mixing changes in the numerical
-    grid or prediction horizon with changes in the data distribution.
+    Seeds are role-separated and generated initial conditions are checked by a
+    canonical content identity. This prevents silent train/validation/OOD
+    leakage as well as mixing numerical-grid changes with distribution changes.
     """
 
     specs = (train, validation, ood)
@@ -111,10 +145,24 @@ def generate_burgers_split(
                 f"train, validation and ood must share {attribute}; got {values}"
             )
 
+    seeds = [spec.seed for spec in specs]
+    if len(set(seeds)) != len(seeds):
+        raise ValueError(
+            "train, validation and ood must use distinct seed domains; "
+            f"got {seeds}"
+        )
+
+    partitions = {
+        "train": train.build(),
+        "validation": validation.build(),
+        "ood": ood.build(),
+    }
+    _assert_disjoint_inputs(partitions)
+
     return BurgersDatasetSplit(
-        train=train.build(),
-        validation=validation.build(),
-        ood=ood.build(),
+        train=partitions["train"],
+        validation=partitions["validation"],
+        ood=partitions["ood"],
         train_spec=train,
         validation_spec=validation,
         ood_spec=ood,
