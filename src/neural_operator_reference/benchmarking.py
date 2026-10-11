@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import platform
+import sys
 from dataclasses import dataclass
 from time import perf_counter
 from typing import Callable
@@ -104,6 +105,23 @@ _TIMING_THREAD_ENV = (
 )
 
 
+def _backend_threading_context() -> dict[str, object]:
+    """Capture effective thread settings from already loaded optional backends."""
+
+    torch = sys.modules.get("torch")
+    if torch is None:
+        return {}
+    settings: dict[str, int] = {}
+    for key, getter_name in (
+        ("num_threads", "get_num_threads"),
+        ("num_interop_threads", "get_num_interop_threads"),
+    ):
+        getter = getattr(torch, getter_name, None)
+        if callable(getter):
+            settings[key] = int(getter())
+    return {"torch": settings} if settings else {}
+
+
 def _timing_context() -> dict[str, object]:
     """Capture bounded hardware/runtime context without arbitrary environment."""
 
@@ -117,6 +135,7 @@ def _timing_context() -> dict[str, object]:
             for name in _TIMING_THREAD_ENV
             if name in os.environ
         },
+        "backend_threading": _backend_threading_context(),
         "limitations": [
             "wall-clock array-adapter measurement, not kernel-only timing",
             "GPU transfer and synchronization may be included by output conversion",
