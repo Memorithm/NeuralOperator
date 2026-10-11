@@ -62,6 +62,12 @@ class TorchBenchmarkingTests(unittest.TestCase):
         self.assertEqual(deeponet_prediction.shape, inputs.shape)
         self.assertGreaterEqual(fno_timing.total_seconds, 0.0)
         self.assertGreaterEqual(deeponet_timing.total_seconds, 0.0)
+        torch_context = fno_timing.context["backend_threading"]["torch"]
+        self.assertEqual(torch_context["num_threads"], torch.get_num_threads())
+        self.assertEqual(
+            torch_context["num_interop_threads"],
+            torch.get_num_interop_threads(),
+        )
 
 
 if __name__ == "__main__":
