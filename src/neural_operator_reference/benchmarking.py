@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import os
+import platform
+import sys
 from dataclasses import dataclass
 from time import perf_counter
 from typing import Callable
@@ -60,18 +63,103 @@ def summarize_scalars(values) -> ScalarSummary:
 
 @dataclass(frozen=True)
 class InferenceTiming:
-    """Wall-clock timing for repeated operator evaluations."""
+    """End-to-end wall-clock timing for the array-operator adapter contract.
+
+    Each sample includes the operator call, output detachment, host transfer,
+    NumPy conversion, finiteness validation and shape validation. It is not a
+    kernel-only measurement.
+    """
 
     repeats: int
     total_seconds: float
     seconds_per_call: float
+    sample_std_seconds: float
+    minimum_seconds: float
+    maximum_seconds: float
+    scope: str
+    warmup_calls: int
+    includes_output_conversion: bool
+    context: dict[str, object]
 
-    def as_dict(self) -> dict[str, int | float]:
+    def as_dict(self) -> dict[str, object]:
         return {
             "repeats": self.repeats,
             "total_seconds": self.total_seconds,
             "seconds_per_call": self.seconds_per_call,
+            "sample_std_seconds": self.sample_std_seconds,
+            "minimum_seconds": self.minimum_seconds,
+            "maximum_seconds": self.maximum_seconds,
+            "scope": self.scope,
+            "warmup_calls": self.warmup_calls,
+            "includes_output_conversion": self.includes_output_conversion,
+            "context": self.context,
         }
+
+
+_TIMING_THREAD_ENV = (
+    "OMP_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
+)
+
+
+def _backend_threading_context() -> dict[str, object]:
+    """Capture effective thread settings from already loaded optional backends."""
+
+    torch = sys.modules.get("torch")
+    if torch is None:
+        return {}
+    settings: dict[str, int] = {}
+    for key, getter_name in (
+        ("num_threads", "get_num_threads"),
+        ("num_interop_threads", "get_num_interop_threads"),
+    ):
+        getter = getattr(torch, getter_name, None)
+        if callable(getter):
+            settings[key] = int(getter())
+    return {"torch": settings} if settings else {}
+
+
+def _timing_context() -> dict[str, object]:
+    """Capture bounded hardware/runtime context without arbitrary environment."""
+
+    return {
+        "platform": platform.system(),
+        "machine": platform.machine(),
+        "python": platform.python_version(),
+        "logical_cpu_count": os.cpu_count(),
+        "threading_environment": {
+            name: os.environ[name]
+            for name in _TIMING_THREAD_ENV
+            if name in os.environ
+        },
+        "backend_threading": _backend_threading_context(),
+        "limitations": [
+            "wall-clock array-adapter measurement, not kernel-only timing",
+            "GPU transfer and synchronization may be included by output conversion",
+            "results are comparable only under matched hardware and runtime context",
+        ],
+    }
+
+
+def _build_inference_timing(call_seconds: list[float]) -> InferenceTiming:
+    """Build an auditable end-to-end timing summary from per-call samples."""
+
+    summary = summarize_scalars(call_seconds)
+    return InferenceTiming(
+        repeats=summary.count,
+        total_seconds=float(np.sum(call_seconds)),
+        seconds_per_call=summary.mean,
+        sample_std_seconds=summary.sample_std,
+        minimum_seconds=summary.minimum,
+        maximum_seconds=summary.maximum,
+        scope="array_operator_end_to_end",
+        warmup_calls=1,
+        includes_output_conversion=True,
+        context=_timing_context(),
+    )
 
 
 @dataclass(frozen=True)
@@ -174,20 +262,16 @@ def benchmark_inference(
             f"got {prediction.shape} for {inputs.shape}"
         )
 
-    start = perf_counter()
+    call_seconds: list[float] = []
     for _ in range(int(repeats)):
+        start = perf_counter()
         prediction = _as_numpy_output(operator(inputs))
         if prediction.shape != inputs.shape:
             raise ValueError(
                 "operator must preserve the input shape during timing"
             )
-    total = perf_counter() - start
-    timing = InferenceTiming(
-        repeats=int(repeats),
-        total_seconds=float(total),
-        seconds_per_call=float(total / int(repeats)),
-    )
-    return prediction, timing
+        call_seconds.append(perf_counter() - start)
+    return prediction, _build_inference_timing(call_seconds)
 
 
 def evaluate_burgers_dataset(
@@ -299,19 +383,16 @@ def evaluate_darcy_tensor_dataset(
             f"{expected_shape}; got {prediction.shape}"
         )
 
-    start = perf_counter()
+    call_seconds: list[float] = []
     for _ in range(int(repeats)):
+        start = perf_counter()
         prediction = _as_numpy_output(operator(inputs))
         if prediction.shape != expected_shape:
             raise ValueError(
                 "tensor Darcy operator output shape changed during timing"
             )
-    total = perf_counter() - start
-    timing = InferenceTiming(
-        repeats=int(repeats),
-        total_seconds=float(total),
-        seconds_per_call=float(total / int(repeats)),
-    )
+        call_seconds.append(perf_counter() - start)
+    timing = _build_inference_timing(call_seconds)
 
     error = prediction - dataset.targets
     pressure = prediction[..., 0]
