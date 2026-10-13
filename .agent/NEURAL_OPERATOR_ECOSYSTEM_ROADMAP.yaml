@@ -24,9 +24,9 @@ ax_task_program:
 
 first_rust_darcy_kernel_2026_10_13:
   finding: B-NO-01
-  status: candidate_exact_head_CI_pending
+  status: exact_head_CI_qualified_waiting_guarded_merge
   pull_request: 37
-  candidate_sha: 9f89b2a0f3aaa203e1f181bee30e2d5afb48bad3
+  candidate_sha: 4686bf6dabd01374a5d0ec483bba507534f1d98d
   oracle_source_sha: fcd34147c9623ffd8ea49dbb7894e0516fb88be0
   contract: neural-operator.rust-darcy-qualification@1
   scope: isotropic_conservative_residual_not_solver_or_trained_model
@@ -35,3 +35,7 @@ first_rust_darcy_kernel_2026_10_13:
   external_Rust_dependencies: 0
   authority: domain_and_model_authority_unchanged
   next: all_exact_head_gates_review_then_guarded_merge_and_target_qualification
+
+  oracle_SHA256_pin: c72975c02563d8c554bcbfcd419fcd1711c9f4e63491a76e5ef0e676fac39a92
+  oracle_pin_verified_before_direct_import: true
+  regression_tests: original_load_and_drift_rejected_before_execution
