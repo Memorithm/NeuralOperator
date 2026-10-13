@@ -21,3 +21,17 @@ ax_task_program:
   invariants:
     - task_success_is_not_operator_accuracy_or_generalization_evidence
     - comparisons_keep_declared_budget_and_data_splits_fixed
+
+first_rust_darcy_kernel_2026_10_13:
+  finding: B-NO-01
+  status: candidate_exact_head_CI_pending
+  pull_request: 37
+  candidate_sha: 9f89b2a0f3aaa203e1f181bee30e2d5afb48bad3
+  oracle_source_sha: fcd34147c9623ffd8ea49dbb7894e0516fb88be0
+  contract: neural-operator.rust-darcy-qualification@1
+  scope: isotropic_conservative_residual_not_solver_or_trained_model
+  cases: 32
+  MSRV: "1.89"
+  external_Rust_dependencies: 0
+  authority: domain_and_model_authority_unchanged
+  next: all_exact_head_gates_review_then_guarded_merge_and_target_qualification
