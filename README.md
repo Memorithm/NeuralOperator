@@ -84,6 +84,12 @@ aucun accès réseau n'est nécessaire pour ces vérifications.
 
 ## Prochain jalon
 
+Un premier noyau Rust borné, `neural-operator-rust::darcy_residual`, est
+qualifiable contre l'oracle NumPy/SciPy original sans remplacer les modèles
+Python. [Le protocole de parité et de coût](docs/RUST_DARCY_QUALIFICATION.md)
+décrit les 32 cas synthétiques, les limites et les preuves requises. Cette
+tranche ne constitue pas un solveur/modèle Rust complet ni une adoption SciRust.
+
 Le socle Burgers dispose désormais des baselines, du backend autodiff PyTorch,
 de la comparaison FNO/DeepONet et d'un PINO de transition différentiable.
 Le deuxième problème de vérité terrain est Darcy 2D : le dépôt contient un
