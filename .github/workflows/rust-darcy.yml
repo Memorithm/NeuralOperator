@@ -1,0 +1,57 @@
+name: Rust Darcy qualification
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+permissions:
+  contents: read
+concurrency:
+  group: rust-darcy-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  rust-darcy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      SOURCE_HEAD_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+      OMP_NUM_THREADS: "1"
+      OPENBLAS_NUM_THREADS: "1"
+      MKL_NUM_THREADS: "1"
+      PYTHONHASHSEED: "0"
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@fa04a1451ff1842e2626ccb99004d0195b455a88
+        with:
+          toolchain: 1.89.0
+          components: rustfmt, clippy
+      - uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38
+        with:
+          python-version: "3.12.8"
+      - name: Retain exact Rust environment
+        run: |
+          mkdir -p rust-darcy-evidence
+          rustc -vV > rust-darcy-evidence/rustc.txt
+          git rev-parse HEAD > rust-darcy-evidence/source.txt
+          sha256sum Cargo.lock requirements-py312-linux.lock src/neural_operator_reference/darcy.py > rust-darcy-evidence/sources.sha256
+      - name: Format, lint and MSRV tests (no dependencies)
+        run: |
+          cargo fmt --all -- --check
+          cargo clippy --all-targets --locked -- -D warnings
+          cargo test --all-targets --locked
+          cargo build --release --frozen --example darcy_probe
+      - name: Install original independently locked Python oracle
+        run: python -m pip install --require-hashes -r requirements-py312-linux.lock
+      - name: Execute frozen synthetic parity and measured cost
+        run: PYTHONPATH=src timeout --kill-after=5s 180s python scripts/qualify_rust_darcy.py --binary target/release/examples/darcy_probe --output rust-darcy-evidence
+      - name: Retain all inputs, oracle results, Rust results and cost
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: rust-darcy-${{ github.event.pull_request.head.sha || github.sha }}
+          path: rust-darcy-evidence/
+          if-no-files-found: error
+          retention-days: 90

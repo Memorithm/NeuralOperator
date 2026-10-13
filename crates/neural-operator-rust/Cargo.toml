@@ -1,0 +1,12 @@
+[package]
+name = "neural-operator-rust"
+version = "0.1.0"
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+description = "Bounded Darcy residual research kernel with independent Python qualification"
+
+[lints]
+workspace = true
