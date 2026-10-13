@@ -23,6 +23,11 @@ deux états (fourni et résolu par `solve_darcy_2d` SciPy). Aucun dataset/holdou
 modèle existant n'est consommé. La tolérance est rtol=1e-12, atol=1e-10, annoncée
 avant observation. Les flux NumPy de l'oracle original sont indépendants de la
 portée Rust ; les champs d'entrée communs ne calculent aucun résultat de référence.
+Le SHA-256 exact `c72975c02563d8c554bcbfcd419fcd1711c9f4e63491a76e5ef0e676fac39a92`
+du module de référence est vérifié **avant import**, puis le fichier est chargé
+directement (pas via un `__init__` de package mutable). Un changement simultané
+Rust/Python ne passe pas sans repin explicite revu du protocole. Deux tests
+qualifient le chargement original et le refus d'une source modifiée avant exécution.
 
 La qualification vérifie aussi les comptes structuraux exacts : une sortie
 f64 par cellule intérieure et `4 + 30 * cellules_intérieures` opérations

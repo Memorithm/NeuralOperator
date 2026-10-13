@@ -3,16 +3,33 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import importlib.util
 import json
 import os
 import platform
 import subprocess
 from pathlib import Path
+from types import ModuleType
 
 import numpy as np
 import scipy
 
-from neural_operator_reference.darcy import darcy_residual_2d, solve_darcy_2d
+ORACLE_REVISION = "fcd34147c9623ffd8ea49dbb7894e0516fb88be0"
+ORACLE_SHA256 = "c72975c02563d8c554bcbfcd419fcd1711c9f4e63491a76e5ef0e676fac39a92"
+
+
+def load_frozen_oracle(source: Path) -> ModuleType:
+    """Verify immutable baseline bytes before importing any oracle code."""
+    if hashlib.sha256(source.read_bytes()).hexdigest() != ORACLE_SHA256:
+        raise ValueError("Darcy oracle drift: explicit baseline review/repin required")
+    # Load the verified file directly, not package __init__ or a replaceable
+    # sys.path module which could intercept the independent reference.
+    spec = importlib.util.spec_from_file_location("frozen_darcy_oracle", source)
+    if spec is None or spec.loader is None:
+        raise ValueError("cannot load verified Darcy oracle")
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def main() -> None:
@@ -21,6 +38,8 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     binary = args.binary.resolve()
+    source = Path("src/neural_operator_reference/darcy.py").resolve()
+    oracle = load_frozen_oracle(source)
     args.output.mkdir(parents=True, exist_ok=True)
     records = []
     fixtures = []
@@ -33,10 +52,10 @@ def main() -> None:
             forcing = ((5 * x + 3 * y + seed) % 17) / 4.0 - 1.0
             lx, ly = 1.0 + seed / 4.0, 0.75 + seed / 8.0
             supplied = np.sin(x * 0.125) + np.cos(y * 0.25)
-            solved = solve_darcy_2d(k, forcing, lx, ly)
+            solved = oracle.solve_darcy_2d(k, forcing, lx, ly)
             for kind, u in [("supplied", supplied), ("solved", solved)]:
                 name = f"{rows}x{columns}-s{seed}-{kind}"
-                reference = darcy_residual_2d(u, k, forcing, lx, ly).reshape(-1)
+                reference = oracle.darcy_residual_2d(u, k, forcing, lx, ly).reshape(-1)
                 fixture = (
                     f"{rows} {columns} {lx:.17e} {ly:.17e}\n"
                     + "\n".join(" ".join(f"{v:.17e}" for v in a.reshape(-1)) for a in (u, k, forcing))
@@ -70,13 +89,14 @@ def main() -> None:
                     "max_abs_error": float(np.max(np.abs(actual - reference))),
                     "cost": cost,
                 })
-    source = Path("src/neural_operator_reference/darcy.py")
     report = {
         "schema": "neural-operator.rust-darcy-qualification@1",
         "source_head_sha": os.environ["SOURCE_HEAD_SHA"],
         "python": platform.python_version(), "platform": platform.platform(),
         "numpy": np.__version__, "scipy": scipy.__version__,
         "oracle_source_sha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+        "oracle_revision": ORACLE_REVISION,
+        "oracle_pin_verified_before_import": True,
         "binary_sha256": hashlib.sha256(binary.read_bytes()).hexdigest(),
         "corpus_sha256": hashlib.sha256(b"".join(fixtures)).hexdigest(),
         "rtol": 1e-12, "atol": 1e-10,
