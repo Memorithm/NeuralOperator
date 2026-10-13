@@ -24,7 +24,7 @@ ax_task_program:
 
 first_rust_darcy_kernel_2026_10_13:
   finding: B-NO-01
-  status: exact_head_CI_qualified_waiting_guarded_merge
+  status: resolved_first_kernel
   pull_request: 37
   candidate_sha: 4686bf6dabd01374a5d0ec483bba507534f1d98d
   oracle_source_sha: fcd34147c9623ffd8ea49dbb7894e0516fb88be0
@@ -34,8 +34,19 @@ first_rust_darcy_kernel_2026_10_13:
   MSRV: "1.89"
   external_Rust_dependencies: 0
   authority: domain_and_model_authority_unchanged
-  next: all_exact_head_gates_review_then_guarded_merge_and_target_qualification
+  next: requalify_later_solver_model_or_SciRust_migrations_without_claim_inflation
 
   oracle_SHA256_pin: c72975c02563d8c554bcbfcd419fcd1711c9f4e63491a76e5ef0e676fac39a92
   oracle_pin_verified_before_direct_import: true
   regression_tests: original_load_and_drift_rejected_before_execution
+
+  integrated_main_sha: 2eba990da4779aeecfea1c4c288d8a6e552c48d8
+  integrated_jobs: 3_success
+  integrated_qualification_run: 38430486796
+  integrated_artifact: 11830576704
+  integrated_archive_SHA256: 6c6991b5b0cc6873783b74cc1f7ba484c285658b9dc77d9737d3400957c89c2d
+  Rust_tests: 8
+  Python_unit_tests: 92
+  observed_max_abs_error: 0
+  candidate_and_integrated_corpus_SHA256: ef97aa6716da4aae6e562d8740acecda9a0b536e8a8c2212961e902cac3d1810
+  last_reconciled: "2026-10-13T18:34:55.000+02:00"
